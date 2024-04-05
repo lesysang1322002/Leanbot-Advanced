@@ -147,5 +147,14 @@ body {
 @media screen and (max-width: 1100px) {
 
 }
-@media screen and (max-width: 400px) {
+@media screen and (max-width: 500px) {
+    .sensor-value {
+        width: 300px;
+    }
+    .container {
+        width: 100%;
+    }
+    .module-title {
+        font-size: 16px;
+    }
 }
