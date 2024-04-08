@@ -40,7 +40,7 @@ navigator.bluetooth.requestDevice({
         return service.getCharacteristic(bleCharacteristic);
     })
     .then(characteristic => {
-        logstatus(dev.name + " Advance Modules");
+        logstatus(dev.name + " - Advance Modules");
         // checkMessageWithin5Seconds();
         document.getElementById("buttonText").innerText = "Rescan";
         checkconnected = true;
