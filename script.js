@@ -40,7 +40,7 @@ navigator.bluetooth.requestDevice({
         return service.getCharacteristic(bleCharacteristic);
     })
     .then(characteristic => {
-        logstatus(dev.name + " - Advance Modules");
+        logstatus(dev.name + "-Advance Modules");
         // checkMessageWithin5Seconds();
         document.getElementById("buttonText").innerText = "Rescan";
         checkconnected = true;
@@ -115,6 +115,16 @@ let string = "";
 let textAreaAPDS = document.getElementById("textAreaAPDS");
 let textAreaMPU = document.getElementById("textAreaMPU");
 let textAreaMAX = document.getElementById("textAreaMAX");
+let R = document.getElementById("R");
+let G = document.getElementById("G");
+let B = document.getElementById("B");
+let Ax = document.getElementById("Ax");
+let Ay = document.getElementById("Ay");
+let Az = document.getElementById("Az");
+let Gx = document.getElementById("Gx");
+let Gy = document.getElementById("Gy");
+let Gz = document.getElementById("Gz");
+
 let stringcheck = "";
 
 
@@ -126,18 +136,39 @@ function handleChangedValue(event) {
     let n = valueString.length;
     if(valueString[n-1] === '\n'){
         string += valueString;
+        let whitespaceindices = [];
+        let tabindices = [];
         console.log(string);
-        let whitespaceindex = string.indexOf(' ');
-        let stringCheck = string.substring(0, whitespaceindex);
-        let stringResult = string.substring(whitespaceindex + 1, string.length-1);
+        for(let i = 0; i < string.length; i++){
+            if(string[i] === ' '){
+                whitespaceindices.push(i);
+            }
+            if(string[i] === '\t'){
+                tabindices.push(i);
+            }
+        }
+        let stringCheck = string.substring(0, whitespaceindices[0]);
+        let stringResult = string.substring(whitespaceindices[0] + 1, string.length-1);
         if(stringCheck === 'MAX4466'){
             textAreaMAX.value = stringResult;
         }
         if(stringCheck === 'MPU6050'){
             textAreaMPU.value = stringResult;
+            Ax.textContent = string.substring(whitespaceindices[1] + 1, tabindices[0]);
+            Ay.textContent = string.substring(tabindices[0] + 1, tabindices[1]);
+            Az.textContent = string.substring(tabindices[1] + 1, tabindices[2]);
+            Gx.textContent = string.substring(whitespaceindices[2] + 1, tabindices[3]);
+            Gy.textContent = string.substring(tabindices[3] + 1, tabindices[4]);
+            Gz.textContent = string.substring(tabindices[4] + 1, string.length-1);
+            console.log("A " + Ax.textContent + " " + Ay.textContent + " " + Az.textContent);
+            console.log("G " + Gx.textContent + " " + Gy.textContent + " " + Gz.textContent);
         }
         if(stringCheck === 'APDS9960'){
             textAreaAPDS.value = stringResult;
+            R.textContent = string.substring(whitespaceindices[1] + 1, tabindices[0]);
+            G.textContent = string.substring(tabindices[0] + 1, tabindices[1]);
+            B.textContent = string.substring(tabindices[1] + 1, string.length-1);
+            console.log("RGB " + R.textContent + " " + G.textContent + " " + B.textContent);
         }
         string = "";
     }

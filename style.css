@@ -103,8 +103,7 @@ p{
 }
 
 .sensor-value {
-    /* width: 500px; */
-    height: 100px;
+    height: 80px;
     border: 2px solid #ccc;
     padding: 10px;
     resize: none;
@@ -115,6 +114,15 @@ p{
     font-size: 18px;
     font-weight: bold;
     margin-bottom: 10px;
+}
+.row{
+  padding-top: 10px;
+  display: flex;
+  justify-content: space-around;
+}
+.border{
+  border: 5px solid #000000;
+  border-radius: 1px;
 }
 /* @media screen and (max-width: 1100px) {
 
