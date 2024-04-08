@@ -159,6 +159,6 @@ p{
     width: calc(100% - 20px);
   }
   #navbarTitle {
-    margin-right:0px;
+    font-size: 12px;
   }
 }
