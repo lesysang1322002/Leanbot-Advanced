@@ -158,4 +158,7 @@ p{
   .item {
     width: calc(100% - 20px);
   }
+  #navbarTitle {
+    margin-right:0px;
+  }
 }

@@ -127,15 +127,17 @@ function handleChangedValue(event) {
     if(valueString[n-1] === '\n'){
         string += valueString;
         console.log(string);
-        stringcheck = string.substring(0, 7);
-        if(stringcheck === 'MAX4466'){
-            textAreaMAX.value = string.substring(string.indexOf('N'), string.length-1);
+        let whitespaceindex = string.indexOf(' ');
+        let stringCheck = string.substring(0, whitespaceindex);
+        let stringResult = string.substring(whitespaceindex + 1, string.length-1);
+        if(stringCheck === 'MAX4466'){
+            textAreaMAX.value = stringResult;
         }
-        if(stringcheck === 'MPU6050'){
-            textAreaMPU.value = string.substring(string.indexOf('A'), string.length-1);
+        if(stringCheck === 'MPU6050'){
+            textAreaMPU.value = stringResult;
         }
-        if(stringcheck === 'APDS996'){
-            textAreaAPDS.value = string.substring(string.indexOf('R'), string.length-1);
+        if(stringCheck === 'APDS9960'){
+            textAreaAPDS.value = stringResult;
         }
         string = "";
     }
