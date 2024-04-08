@@ -40,7 +40,7 @@ navigator.bluetooth.requestDevice({
         return service.getCharacteristic(bleCharacteristic);
     })
     .then(characteristic => {
-        logstatus(dev.name);
+        logstatus(dev.name + " Advance Modules");
         // checkMessageWithin5Seconds();
         document.getElementById("buttonText").innerText = "Rescan";
         checkconnected = true;
@@ -115,6 +115,7 @@ let string = "";
 let textAreaAPDS = document.getElementById("textAreaAPDS");
 let textAreaMPU = document.getElementById("textAreaMPU");
 let textAreaMAX = document.getElementById("textAreaMAX");
+let stringcheck = "";
 
 
 function handleChangedValue(event) {
@@ -123,26 +124,26 @@ function handleChangedValue(event) {
     let textDecoder = new TextDecoder('utf-8');
     let valueString = textDecoder.decode(dataArray);
     let n = valueString.length;
-    if(valueString[n-1]=='\n'){
+    if(valueString[n-1] === '\n'){
         string += valueString;
-        let Nindex = string.indexOf('N');
-        let aindex = string.indexOf('a');
-        textAreaAPDS.value = string.substring(0, Nindex-2);
-        textAreaMAX.value = string.substring(Nindex, aindex-2);
-        textAreaMPU.value = string.substring(aindex, string.length-1);
-        // let stringcheck = string[0] + string[1] + string[2] + string[3] + string[4];
-        // if (stringcheck === "GetCa" &&  !checkmessage) {
-        //     console.log("Previous message within 5 seconds.");
-        //     checkmessage = true;
-        //     clearTimeout(timeoutCheckMessage);// Hủy kết thúc sau 5 giây
-        // }
         console.log(string);
+        stringcheck = string.substring(0, 7);
+        if(stringcheck === 'MAX4466'){
+            textAreaMAX.value = string.substring(string.indexOf('N'), string.length-1);
+        }
+        if(stringcheck === 'MPU6050'){
+            textAreaMPU.value = string.substring(string.indexOf('A'), string.length-1);
+        }
+        if(stringcheck === 'APDS996'){
+            textAreaAPDS.value = string.substring(string.indexOf('R'), string.length-1);
+        }
         string = "";
     }
     else{
         string += valueString;     
     }
 }
+
 function handleAction(action) {
     if (checkconnected) {
         send(action);
