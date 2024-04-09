@@ -136,39 +136,34 @@ function handleChangedValue(event) {
     let n = valueString.length;
     if(valueString[n-1] === '\n'){
         string += valueString;
-        let whitespaceindices = [];
-        let tabindices = [];
-        console.log(string);
-        for(let i = 0; i < string.length; i++){
-            if(string[i] === ' '){
-                whitespaceindices.push(i);
-            }
-            if(string[i] === '\t'){
-                tabindices.push(i);
-            }
+        let arrString = string.split(/[ \t\r\n]+/);
+        let stringResult = string.substring(string.indexOf(' ') + 1, string.length-1);
+        if(arrString[1] === 'MPU6050'){
+            textAreaMPU.value = string;
         }
-        let stringCheck = string.substring(0, whitespaceindices[0]);
-        let stringResult = string.substring(whitespaceindices[0] + 1, string.length-1);
-        if(stringCheck === 'MAX4466'){
+        console.log(string);
+        console.log(arrString[1]);
+        if(arrString[1] === 'APDS9960'){
+            textAreaAPDS.value = string;
+            console.log(string);
+        }
+        if(arrString[0] === 'MAX4466'){
             textAreaMAX.value = stringResult;
         }
-        if(stringCheck === 'MPU6050'){
+        if(arrString[0] === 'MPU6050'){
             textAreaMPU.value = stringResult;
-            Ax.textContent = string.substring(whitespaceindices[1] + 1, tabindices[0]);
-            Ay.textContent = string.substring(tabindices[0] + 1, tabindices[1]);
-            Az.textContent = string.substring(tabindices[1] + 1, tabindices[2]);
-            Gx.textContent = string.substring(whitespaceindices[2] + 1, tabindices[3]);
-            Gy.textContent = string.substring(tabindices[3] + 1, tabindices[4]);
-            Gz.textContent = string.substring(tabindices[4] + 1, string.length-1);
-            console.log("A " + Ax.textContent + " " + Ay.textContent + " " + Az.textContent);
-            console.log("G " + Gx.textContent + " " + Gy.textContent + " " + Gz.textContent);
+            Ax.textContent = arrString[2];
+            Ay.textContent = arrString[3];
+            Az.textContent = arrString[4];
+            Gx.textContent = arrString[6];
+            Gy.textContent = arrString[7];
+            Gz.textContent = arrString[8];
         }
-        if(stringCheck === 'APDS9960'){
+        if(arrString[0] === 'APDS9960'){
             textAreaAPDS.value = stringResult;
-            R.textContent = string.substring(whitespaceindices[1] + 1, tabindices[0]);
-            G.textContent = string.substring(tabindices[0] + 1, tabindices[1]);
-            B.textContent = string.substring(tabindices[1] + 1, string.length-1);
-            console.log("RGB " + R.textContent + " " + G.textContent + " " + B.textContent);
+            R.textContent = arrString[2];
+            G.textContent = arrString[3];
+            B.textContent = arrString[4];
         }
         string = "";
     }
