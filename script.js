@@ -138,15 +138,6 @@ function handleChangedValue(event) {
         string += valueString;
         let arrString = string.split(/[ \t\r\n]+/);
         let stringResult = string.substring(string.indexOf(' ') + 1, string.length-1);
-        if(arrString[1] === 'MPU6050'){
-            textAreaMPU.value = string;
-        }
-        console.log(string);
-        console.log(arrString[1]);
-        if(arrString[1] === 'APDS9960'){
-            textAreaAPDS.value = string;
-            console.log(string);
-        }
         if(arrString[0] === 'MAX4466'){
             textAreaMAX.value = stringResult;
         }
