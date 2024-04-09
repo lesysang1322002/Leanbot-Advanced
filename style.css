@@ -97,7 +97,8 @@ p{
   text-align: center;
 }
 #R, #G, #B, #Ax, #Ay, #Az, #Gx, #Gy, #Gz{
-  border: 3px solid #000000;
+  border: 2px solid #ccc;
+  border-radius: 1px;
 }
 .sensor-name {
   text-align: center;
@@ -105,7 +106,7 @@ p{
 }
 
 .sensor-value {
-  border: 3px solid #000000;
+  border: 3px solid #ccc;
   padding: 10px;
   resize: none;
   text-align: center;
