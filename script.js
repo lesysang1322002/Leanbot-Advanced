@@ -115,6 +115,7 @@ let string = "";
 let textAreaAPDS = document.getElementById("textAreaAPDS");
 let textAreaMPU = document.getElementById("textAreaMPU");
 let textAreaMAX = document.getElementById("textAreaMAX");
+let TextAreaGesture = document.getElementById("textAreaGesture");
 let R = document.getElementById("R");
 let G = document.getElementById("G");
 let B = document.getElementById("B");
@@ -151,10 +152,15 @@ function handleChangedValue(event) {
             Gz.textContent = arrString[8];
         }
         if(arrString[0] === 'APDS9960'){
+            if(arrString[1] === 'gesture'){
+                TextAreaGesture.value = arrString[2];
+            }
+            else{
             textAreaAPDS.value = stringResult;
             R.textContent = arrString[2];
             G.textContent = arrString[3];
             B.textContent = arrString[4];
+            }
         }
         string = "";
     }

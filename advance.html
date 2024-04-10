@@ -39,9 +39,22 @@
         <label class="sensor-name"><strong>APDS 9960</strong></label>
         <textarea class="sensor-value" id="textAreaAPDS" readonly></textarea>
         <div class = "row">
-        <p>R<span id="R"></span></p>
-        <p>G<span id="G"></span></p>
-        <p>B<span id="B"></span></p>
+            <div class="form-group">
+                <label for="message">R</label>
+                <textarea id="R" name="message"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="message">G</label>
+                <textarea id="G" name="message"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="message">B</label>
+                <textarea id="B" name="message"></textarea>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="message">Gesture</label>
+            <textarea id="textAreaGesture" name="message"></textarea>
         </div>
     </div>
     <div class="item">
@@ -53,16 +66,34 @@
         <textarea class="sensor-value" id="textAreaMPU" readonly></textarea>
         <div class = "row">
             <div class = "colume">
-                <p>Ax<span id="Ax"></span></p>
-                <p>Gx<span id="Gx"></span></p>
+                <div class="form-group">
+                    <label for="message">Ax</label>
+                    <textarea id="Ax" name="message"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="message">Gx</label>
+                    <textarea id="Gx" name="message"></textarea>
+                </div>
             </div>
             <div class = "colume">
-                <p>Ay<span id="Ay"></span></p>
-                <p>Gy<span id="Gy"></span></p>
+                <div class="form-group">
+                    <label for="message">Ay</label>
+                    <textarea id="Ay" name="message"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="message">Gy</label>
+                    <textarea id="Gy" name="message"></textarea>
+                </div>
             </div>
             <div class = "colume">
-                <p>Az<span id="Az"></span></p>
-                <p>Gz<span id="Gz"></span></p>
+                <div class="form-group">
+                    <label for="message">Az</label>
+                    <textarea id="Az" name="message"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="message">Gz</label>
+                    <textarea id="Gz" name="message"></textarea>
+                </div>
             </div>
         </div>
     </div>
