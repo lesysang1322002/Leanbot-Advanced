@@ -98,7 +98,7 @@ p{
 }
 #R, #G, #B, #Ax, #Ay, #Az, #Gx, #Gy, #Gz{
   border: 2px solid #ccc;
-  border-radius: 1px;
+  border-radius: 3px;
 }
 .sensor-name {
   text-align: center;
