@@ -40,7 +40,7 @@ navigator.bluetooth.requestDevice({
         return service.getCharacteristic(bleCharacteristic);
     })
     .then(characteristic => {
-        logstatus(dev.name + "-Advance Modules");
+        logstatus(dev.name + " - Advance Modules");
         // checkMessageWithin5Seconds();
         document.getElementById("buttonText").innerText = "Rescan";
         checkconnected = true;
@@ -127,6 +127,7 @@ let Gy = document.getElementById("Gy");
 let Gz = document.getElementById("Gz");
 
 let stringcheck = "";
+let timeoutId;
 
 
 function handleChangedValue(event) {
@@ -154,6 +155,10 @@ function handleChangedValue(event) {
         if(arrString[0] === 'APDS9960'){
             if(arrString[1] === 'gesture'){
                 TextAreaGesture.value = arrString[2];
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => {
+                    TextAreaGesture.value = '';
+                }, 10000);
             }
             else{
             textAreaAPDS.value = stringResult;

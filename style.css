@@ -110,16 +110,12 @@ p{
   padding: 10px;
   resize: none;
   text-align: center;
+  white-space: nowrap;
 }
 
-.valuechange{
-  border: 3px solid #ccc;
-  width:  50px;
-  height: 30px;
-  resize: none;
-  text-align: center;
+.monospace {
+  font-family: 'Roboto Mono', monospace;
 }
-
 .form-group {
   display: flex;
   align-items: center;
@@ -128,7 +124,7 @@ p{
 .form-group label {
   text-align: right;
   font-weight: bold;
-  padding-right: 2px;
+  padding-right: 5px;
 }
 .form-group textarea {
   flex: 1;
