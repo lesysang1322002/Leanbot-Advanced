@@ -125,6 +125,7 @@ p{
   text-align: right;
   font-weight: bold;
   padding-right: 5px;
+  margin-bottom: 0px;
 }
 .form-group textarea {
   flex: 1;
