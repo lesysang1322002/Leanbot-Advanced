@@ -119,6 +119,7 @@ let TextAreaGesture = document.getElementById("textAreaGesture");
 let R = document.getElementById("R");
 let G = document.getElementById("G");
 let B = document.getElementById("B");
+let C = document.getElementById("C");
 let Ax = document.getElementById("Ax");
 let Ay = document.getElementById("Ay");
 let Az = document.getElementById("Az");
@@ -165,6 +166,7 @@ function handleChangedValue(event) {
             R.textContent = arrString[2];
             G.textContent = arrString[3];
             B.textContent = arrString[4];
+            C.textContent = arrString[5];
             }
         }
         string = "";
