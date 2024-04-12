@@ -2,18 +2,16 @@
 #include <Arduino_APDS9960.h>
 
 #include "MPU6050.h"
-MPU6050 sensor;
-
-int r, g, b, c;
+MPU6050 MPUSensor;
  
 const int delayMs = 20;
  
 void setup() {
   Leanbot.begin();
   Wire.begin();        
- 
-  sensor.initialize();
-  if ( sensor.testConnection() ) {
+  
+  MPUSensor.initialize();
+  if ( MPUSensor.testConnection() ) {
     delay(delayMs);
     Serial.println(F( "Init MPU6050 ok." ));
   } else {
@@ -69,6 +67,7 @@ void  APDS9960_Print(){
   }
  
   if (APDS.colorAvailable()) {
+    int r, g, b, c;
     APDS.readColor(r, g, b, c);
     delay(delayMs);
 
@@ -97,19 +96,19 @@ void MAX4466_Print() {
   long Mean = sum / N_SAMPLES;
   long Var  = (ssum*N_SAMPLES - sum*sum) / (N_SAMPLES*N_SAMPLES);
 
-  Serial.print(F("MAX4466   Noise "));
+  Serial.print(F("MAX4466   Mean "));
   Serial.print(Mean);
   Serial.print(F(" Variance "));
   Serial.println(Var);
 }
  
 void MPU6050_Print(){
-  if(sensor.testConnection()){
+  if(MPUSensor.testConnection()){
     int ax, ay, az;
     int gx, gy, gz;
 
-    sensor.getAcceleration(&ax, &ay, &az);
-    sensor.getRotation(&gx, &gy, &gz);
+    MPUSensor.getAcceleration(&ax, &ay, &az);
+    MPUSensor.getRotation(&gx, &gy, &gz);
     delay(delayMs);
 
     Serial.print(F( "MPU6050   Axyz " ));
@@ -126,4 +125,10 @@ void MPU6050_Print(){
 void Serial_printtb(int a) {
   Serial.print(a);
   Serial.print('\t');
+}
+
+void waitUntilNextBLESend() {
+  static int nextSendTime = 0;
+  while (nextSendTime - millis() >= 0);
+  nextSendTime = millis() + delayMs;
 }

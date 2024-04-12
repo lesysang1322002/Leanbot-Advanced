@@ -116,6 +116,12 @@ let textAreaAPDS = document.getElementById("textAreaAPDS");
 let textAreaMPU = document.getElementById("textAreaMPU");
 let textAreaMAX = document.getElementById("textAreaMAX");
 let TextAreaGesture = document.getElementById("textAreaGesture");
+let TextAreaMean = document.getElementById("textAreaMean");
+let TextAreaVariance = document.getElementById("textAreaVariance");
+let TextAreaMinVariance = document.getElementById("textAreaMinVariance");
+let TextAreaMaxVariance = document.getElementById("textAreaMaxVariance");
+let TextAreaMinMean = document.getElementById("textAreaMinMean");
+let TextAreaMaxMean = document.getElementById("textAreaMaxMean");
 let R = document.getElementById("R");
 let G = document.getElementById("G");
 let B = document.getElementById("B");
@@ -130,6 +136,11 @@ let Gz = document.getElementById("Gz");
 let stringcheck = "";
 let timeoutId;
 
+let arrMean = [10];
+let arrVariance = [10];
+
+let checkFirstValue = true;
+let minMean, maxMean, minVariance, maxVariance;
 
 function handleChangedValue(event) {
     let data = event.target.value;
@@ -143,8 +154,34 @@ function handleChangedValue(event) {
         let arrString = string.split(/[ \t\r\n]+/);
         let stringResult = string.substring(string.indexOf(' ') + 1, string.length-1);
         if(arrString[0] === 'MAX4466'){
+            if(checkFirstValue){
+                minVariance = arrString[4];
+                maxVariance = arrString[4];
+                minMean = arrString[2];
+                maxMean = arrString[2];
+                checkFirstValue = false;
+            }
+            if(arrString[2] < minMean){
+                minMean = arrString[2];
+            }
+            if(arrString[2] > maxMean){
+                maxMean = arrString[2];
+            }
+            if(arrString[4] < minVariance){
+                minVariance = arrString[4];
+            }
+            if(arrString[4] > maxVariance){
+                maxVariance = arrString[4];
+            }
+            TextAreaMinMean.value = minMean;
+            TextAreaMaxMean.value = maxMean;
             textAreaMAX.value = stringResult;
+            arrMean.push(arrString[2]);
+            TextAreaMean.value = arrString[2];
+            arrVariance.push(arrString[4]);
+            TextAreaVariance.value = arrString[4];
         }
+
         if(arrString[0] === 'MPU6050'){
             textAreaMPU.value = stringResult;
             Ax.textContent = arrString[2];
