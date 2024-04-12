@@ -139,6 +139,7 @@ function handleChangedValue(event) {
     let n = valueString.length;
     if(valueString[n-1] === '\n'){
         string += valueString;
+        // string = string.replace(/(\r\n|\n|\r)/gm, "");
         let arrString = string.split(/[ \t\r\n]+/);
         let stringResult = string.substring(string.indexOf(' ') + 1, string.length-1);
         if(arrString[0] === 'MAX4466'){
