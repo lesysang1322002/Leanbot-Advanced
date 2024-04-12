@@ -167,6 +167,7 @@ p{
 .container {
   display: flex;
   flex-wrap: wrap;
+  margin:0px;
 }
 
 .item {
@@ -202,5 +203,8 @@ p{
     resize: none;
     text-align: center;
     font-size: 14px;
+  }
+  #R, #G, #B, #C{
+    width: 42px;
   }
 }
