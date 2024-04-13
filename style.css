@@ -207,4 +207,7 @@ p{
   #R, #G, #B, #C{
     width: 42px;
   }
+  #textAreaMean, #textAreaMaxMean, #textAreaMinMean, #textAreaVariance, #textAreaMinVariance, #textAreaMaxVariance{
+    width: 48px;
+  }
 }

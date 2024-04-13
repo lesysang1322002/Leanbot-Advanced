@@ -108,6 +108,8 @@ function toggleFunction() {
 
 function Rescan(){
     checkconnected = false;
+    clearTimeout(timeoutId);
+    checkFirstValue = true;
     // checkmessage = false;
 }
 
@@ -175,10 +177,13 @@ function handleChangedValue(event) {
             }
             TextAreaMinMean.value = minMean;
             TextAreaMaxMean.value = maxMean;
+            TextAreaMinVariance.value = minVariance;
+            TextAreaMaxVariance.value = maxVariance;
             textAreaMAX.value = stringResult;
-            arrMean.push(arrString[2]);
+            console.log(stringResult);
+            // arrMean.push(arrString[2]);
             TextAreaMean.value = arrString[2];
-            arrVariance.push(arrString[4]);
+            // arrVariance.push(arrString[4]);
             TextAreaVariance.value = arrString[4];
         }
 
