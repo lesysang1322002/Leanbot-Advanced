@@ -166,16 +166,16 @@ function handleChangedValue(event) {
                 checkFirstValue = false;
             }
             if(arr2Int < minMean){
-                minMean = arrString[2];
+                minMean = arr2Int
             }
             if(arr2Int > maxMean){
-                maxMean = arrString[2];
+                maxMean = arr2Int;
             }
             if(arr4Int < minVariance){
-                minVariance = arrString[4];
+                minVariance = arr4Int;
             }
             if(arr4Int > maxVariance){
-                maxVariance = arrString[4];
+                maxVariance = arr4Int;
             }
             TextAreaMinMean.value = minMean;
             TextAreaMaxMean.value = maxMean;
