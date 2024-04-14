@@ -156,31 +156,35 @@ function handleChangedValue(event) {
         let arrString = string.split(/[ \t\r\n]+/);
         let stringResult = string.substring(string.indexOf(' ') + 1, string.length-1);
         if(arrString[0] === 'MAX4466'){
+            let arr2Int = parseInt(arrString[2]);
+            let arr4Int = parseInt(arrString[4]);
             if(checkFirstValue){
-                minVariance = arrString[4];
-                maxVariance = arrString[4];
-                minMean = arrString[2];
-                maxMean = arrString[2];
+                minMean = arr2Int;
+                maxMean = arr2Int;
+                minVariance = arr4Int;
+                maxVariance = arr4Int;
                 checkFirstValue = false;
             }
-            if(arrString[2] < minMean){
+            if(arr2Int < minMean){
                 minMean = arrString[2];
             }
-            if(arrString[2] > maxMean){
+            if(arr2Int > maxMean){
                 maxMean = arrString[2];
             }
-            if(arrString[4] < minVariance){
+            if(arr4Int < minVariance){
                 minVariance = arrString[4];
             }
-            if(arrString[4] > maxVariance){
+            if(arr4Int > maxVariance){
                 maxVariance = arrString[4];
             }
             TextAreaMinMean.value = minMean;
             TextAreaMaxMean.value = maxMean;
             TextAreaMinVariance.value = minVariance;
             TextAreaMaxVariance.value = maxVariance;
+            // console.log("Result:" + (maxVariance-minVariance));
+            // console.log("MinMena " + minMean + " MaxMean "+ maxMean + " MinVar " + minVariance + " MaxVar " + maxVariance);
             textAreaMAX.value = stringResult;
-            console.log(stringResult);
+            // console.log(stringResult);
             // arrMean.push(arrString[2]);
             TextAreaMean.value = arrString[2];
             // arrVariance.push(arrString[4]);
