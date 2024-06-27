@@ -151,6 +151,9 @@ p{
   #R, #G, #B, #C{
     width: 28px;
   }
+  #textAreaMean, #textAreaMaxMean, #textAreaMinMean, #textAreaVariance, #textAreaMinVariance, #textAreaMaxVariance{
+    width: 30px;
+  }
 }
 
 /* @media screen and (max-width: 500px) {
@@ -206,8 +209,5 @@ p{
   }
   #R, #G, #B, #C{
     width: 42px;
-  }
-  #textAreaMean, #textAreaMaxMean, #textAreaMinMean, #textAreaVariance, #textAreaMinVariance, #textAreaMaxVariance{
-    width: 48px;
   }
 }
