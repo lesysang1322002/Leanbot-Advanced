@@ -41,7 +41,7 @@ navigator.bluetooth.requestDevice({
     })
     .then(characteristic => {
         logstatus(dev.name + " - Advance Modules");
-        // checkMessageWithin5Seconds();
+        checkMessageWithin5Seconds();
         document.getElementById("buttonText").innerText = "Rescan";
         checkconnected = true;
         gattCharacteristic = characteristic
@@ -69,6 +69,7 @@ function disconnect()
 function onDisconnected(event) {
     const device = event.target;
     logstatus("SCAN to connect");
+    ResetVariables();
     document.getElementById("buttonText").innerText = "Scan";
     console.log(`Device ${device.name} is disconnected.`);
 }
@@ -107,10 +108,16 @@ function toggleFunction() {
 }
 
 function Rescan(){
+    ResetVariables();
+}
+
+function ResetVariables(){
     checkconnected = false;
     clearTimeout(timeoutId);
     checkFirstValue = true;
-    // checkmessage = false;
+    checkmessageMPU6050 = false;
+    checkmessageAPDS9960 = false;
+    clearTimeout(timeoutCheckMessage);
 }
 
 let string = "";
@@ -143,6 +150,9 @@ let arrVariance = [10];
 
 let checkFirstValue = true;
 let minMean, maxMean, minVariance, maxVariance;
+let timeoutCheckMessage;
+let checkmessageMPU6050 = false;
+let checkmessageAPDS9960 = false;
 
 function handleChangedValue(event) {
     let data = event.target.value;
@@ -152,9 +162,18 @@ function handleChangedValue(event) {
     let n = valueString.length;
     if(valueString[n-1] === '\n'){
         string += valueString;
-        // string = string.replace(/(\r\n|\n|\r)/gm, "");
+        console.log(string);
         let arrString = string.split(/[ \t\r\n]+/);
         let stringResult = string.substring(string.indexOf(' ') + 1, string.length-1);
+        if(arrString[0] === 'Init' && arrString[1] === 'MPU6050'){
+            checkmessageMPU6050 = true;
+        }
+        if(arrString[0] === 'Init' && arrString[1] === 'APDS9960'){
+            checkmessageAPDS9960 = true;
+        }
+        if(checkmessageMPU6050 && checkmessageAPDS9960){
+            clearTimeout(timeoutCheckMessage);
+        }
         if(arrString[0] === 'MAX4466'){
             let arr2Int = parseInt(arrString[2]);
             let arr4Int = parseInt(arrString[4]);
