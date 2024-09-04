@@ -185,12 +185,7 @@ function handleChangedValue(event) {
         console.log(string);
         let arrString = string.split(/[ \t\r\n]+/);
         let stringResult = string.substring(string.indexOf(' ') + 1, string.length-1);
-        if(arrString[0] === 'Init' && arrString[1] === 'MPU6050'){
-            checkmessageMPU6050 = true;
-        }
-        if(arrString[0] === 'Init' && arrString[1] === 'APDS9960'){
-            checkmessageAPDS9960 = true;
-        }
+    
         if(checkmessageMPU6050 && checkmessageAPDS9960){
             clearTimeout(timeoutCheckMessage);
         }
@@ -231,6 +226,7 @@ function handleChangedValue(event) {
         }
 
         if(arrString[0] === 'MPU6050'){
+            checkmessageMPU6050 = true;
             textAreaMPU.value = stringResult;
             Ax.textContent = arrString[2];
             Ay.textContent = arrString[3];
@@ -240,6 +236,7 @@ function handleChangedValue(event) {
             Gz.textContent = arrString[8];
         }
         if(arrString[0] === 'APDS9960'){
+            checkmessageAPDS9960 = true;
             if(arrString[1] === 'gesture'){
                 TextAreaGesture.value = arrString[2];
                 clearTimeout(timeoutId);
@@ -254,6 +251,9 @@ function handleChangedValue(event) {
             B.textContent = arrString[4];
             C.textContent = arrString[5];
             }
+        }
+        if(checkmessageMPU6050 && checkmessageAPDS9960){
+            clearTimeout(timeoutCheckMessage);
         }
         string = "";
     }
