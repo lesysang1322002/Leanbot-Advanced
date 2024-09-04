@@ -118,6 +118,26 @@ function ResetVariables(){
     checkmessageMPU6050 = false;
     checkmessageAPDS9960 = false;
     clearTimeout(timeoutCheckMessage);
+    textAreaAPDS.value = "";
+    textAreaMPU.value = "";
+    textAreaMAX.value = "";
+    TextAreaGesture.value = "";
+    TextAreaMean.value = "";
+    TextAreaVariance.value = "";
+    TextAreaMinVariance.value = "";
+    TextAreaMaxVariance.value = "";
+    TextAreaMinMean.value = "";
+    TextAreaMaxMean.value = "";
+    R.textContent = "";
+    G.textContent = "";
+    B.textContent = "";
+    C.textContent = "";
+    Ax.textContent = "";
+    Ay.textContent = "";
+    Az.textContent = "";
+    Gx.textContent = "";
+    Gy.textContent = "";
+    Gz.textContent = "";
 }
 
 let string = "";
