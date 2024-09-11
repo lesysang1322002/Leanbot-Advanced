@@ -231,7 +231,7 @@ function handleChangedValue(event) {
         string += valueString;
         // console.log(string);
         let arrString = string.split(/[ \t\r\n]+/);
-        let stringResult = string.substring(string.indexOf(' ') + 1, string.length-1);
+        let stringvolume = string.substring(string.indexOf(' ') + 1, string.length-1);
     
         if(checkmessageMPU6050 && checkmessageAPDS9960){
             clearTimeout(timeoutCheckMessage);
@@ -263,7 +263,7 @@ function handleChangedValue(event) {
             // TextAreaMinVariance.value = minVariance;
             // TextAreaMaxVariance.value = maxVariance;
 
-            textAreaMAX.value = stringResult;
+            textAreaMAX.value = stringvolume;
             TextAreaMean.value = arrString[2];
             // TextAreaVariance.value = arrString[4];
             if(arrString[4] === '0') {
@@ -273,14 +273,14 @@ function handleChangedValue(event) {
                 TextAreaMaxMean.value = "";
                 checkFirstValue = true;
             }
-            let result = Math.log10(arr4Int).toFixed(2);
-            document.getElementById("preview-textfield").textContent = result;
-            gauge.set(result);
+            let volume = Math.log10(arr4Int).toFixed(2);
+            document.getElementById("preview-textfield").textContent = volume;
+            gauge.set(volume);
         }
 
         if(arrString[0] === 'MPU6050'){
             checkmessageMPU6050 = true;
-            textAreaMPU.value = stringResult;
+            textAreaMPU.value = stringvolume;
             if(arrString[2] !== "error." && arrString[2] !== "ok.") Ax.textContent = arrString[2];
             Ay.textContent = arrString[3];
             Az.textContent = arrString[4];
@@ -299,7 +299,7 @@ function handleChangedValue(event) {
                 }, 10000);
             }
             else{
-            textAreaAPDS.value = stringResult;
+            textAreaAPDS.value = stringvolume;
             if(arrString[2] !== "error." && arrString[2] !== "ok.")  R.textContent = arrString[2];
             G.textContent = arrString[3];
             B.textContent = arrString[4];
