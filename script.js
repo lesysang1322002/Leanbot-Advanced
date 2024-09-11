@@ -173,8 +173,6 @@ let minMean, maxMean, minVariance, maxVariance;
 let timeoutCheckMessage;
 let checkmessageMPU6050 = false;
 let checkmessageAPDS9960 = false;
-let volume = 0;
-
 // Ensure gauge.js library is loaded
 var opts = {
     colorStart: "#6fadcf",
@@ -274,6 +272,7 @@ function handleChangedValue(event) {
                 checkFirstValue = true;
             }
             let volume = Math.log10(arr4Int).toFixed(2);
+            console.log(volume);
             document.getElementById("preview-textfield").textContent = volume;
             gauge.set(volume);
         }
