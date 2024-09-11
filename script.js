@@ -219,6 +219,8 @@ var opts = {
   // Thiết lập tốc độ chuyển động
   gauge.animationSpeed = 32;
 
+let maxVolume = 0;
+
 function handleChangedValue(event) {
     let data = event.target.value;
     let dataArray = new Uint8Array(data.buffer);
@@ -236,12 +238,12 @@ function handleChangedValue(event) {
         }
         if(arrString[0] === 'MAX4466'){
             let arr2Int = parseInt(arrString[2]);
-            let arr4Int = parseFloat(arrString[4]);
+            let Variance = parseInt(arrString[4]);
             if(checkFirstValue){
                 minMean = arr2Int;
                 maxMean = arr2Int;
-                // minVariance = arr4Int;
-                // maxVariance = arr4Int;
+                // minVariance = Variance;
+                // maxVariance = Variance;
                 checkFirstValue = false;
             }
             if(arr2Int < minMean){
@@ -250,11 +252,11 @@ function handleChangedValue(event) {
             if(arr2Int > maxMean){
                 maxMean = arr2Int;
             }
-            // if(arr4Int < minVariance){
-            //     minVariance = arr4Int;
+            // if(Variance < minVariance){
+            //     minVariance = Variance;
             // }
-            // if(arr4Int > maxVariance){
-            //     maxVariance = arr4Int;
+            // if(Variance > maxVariance){
+            //     maxVariance = Variance;
             // }
             TextAreaMinMean.value = minMean;
             TextAreaMaxMean.value = maxMean;
@@ -271,8 +273,14 @@ function handleChangedValue(event) {
                 TextAreaMaxMean.value = "";
                 checkFirstValue = true;
             }
-            let volume = Math.log10(arr4Int).toFixed(2);
-            console.log(volume);
+            let volume;
+            if(Variance > 0) volume = Math.log10(Variance).toFixed(2);
+            else volume = 0;
+            console.log("Variance: " + Variance + " Volume: " + volume);
+
+            if(volume > maxVolume) maxVolume = volume;
+            // console.log(maxVolume);
+
             document.getElementById("preview-textfield").textContent = volume;
             gauge.set(volume);
         }
