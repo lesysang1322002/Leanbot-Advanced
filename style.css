@@ -173,6 +173,12 @@ p{
   margin:0px;
 }
 
+.preview-textfield {
+  font-size: 20px;
+  text-align: center;
+  font-weight: bold;
+}
+
 .item {
   width: calc(33.33% - 20px);
   margin: 10px;

@@ -123,9 +123,9 @@ function ResetVariables(){
     textAreaMAX.value = "";
     TextAreaGesture.value = "";
     TextAreaMean.value = "";
-    TextAreaVariance.value = "";
-    TextAreaMinVariance.value = "";
-    TextAreaMaxVariance.value = "";
+    // TextAreaVariance.value = "";
+    // TextAreaMinVariance.value = "";
+    // TextAreaMaxVariance.value = "";
     TextAreaMinMean.value = "";
     TextAreaMaxMean.value = "";
     R.textContent = "";
@@ -146,9 +146,9 @@ let textAreaMPU = document.getElementById("textAreaMPU");
 let textAreaMAX = document.getElementById("textAreaMAX");
 let TextAreaGesture = document.getElementById("textAreaGesture");
 let TextAreaMean = document.getElementById("textAreaMean");
-let TextAreaVariance = document.getElementById("textAreaVariance");
-let TextAreaMinVariance = document.getElementById("textAreaMinVariance");
-let TextAreaMaxVariance = document.getElementById("textAreaMaxVariance");
+// let TextAreaVariance = document.getElementById("textAreaVariance");
+// let TextAreaMinVariance = document.getElementById("textAreaMinVariance");
+// let TextAreaMaxVariance = document.getElementById("textAreaMaxVariance");
 let TextAreaMinMean = document.getElementById("textAreaMinMean");
 let TextAreaMaxMean = document.getElementById("textAreaMaxMean");
 let R = document.getElementById("R");
@@ -166,13 +166,60 @@ let stringcheck = "";
 let timeoutId;
 
 let arrMean = [10];
-let arrVariance = [10];
+// let arrVariance = [10];
 
 let checkFirstValue = true;
 let minMean, maxMean, minVariance, maxVariance;
 let timeoutCheckMessage;
 let checkmessageMPU6050 = false;
 let checkmessageAPDS9960 = false;
+let volume = 0;
+
+// Ensure gauge.js library is loaded
+var opts = {
+    colorStart: "#6fadcf",
+    colorStop: void 0,
+    gradientType: 0,
+    strokeColor: "#e0e0e0",
+    generateGradient: true,
+    percentColors: [[0.0, "#a9d70b"], [0.50, "#f9c802"], [1.0, "#ff0000"]],
+    pointer: {
+      length: 0.58,
+      strokeWidth: 0.035,
+      iconScale: 1.0
+    },
+    staticLabels: {
+      font: "10px sans-serif",
+      labels: [1, 2, 3],
+      fractionDigits: 2
+    },
+    staticZones: [
+      { strokeStyle: "#30B32D", min: 0, max: 2 },
+      { strokeStyle: "#FFDD00", min: 2, max: 3 },
+      { strokeStyle: "#F03E3E", min: 3, max: 4 }
+    ],
+    angle: 0.033,
+    lineWidth: 0.30,
+    radiusScale: 1.0,
+    fontSize: 40,
+    highDpiSupport: true
+  };
+
+  // Khởi tạo gauge
+  var target = document.getElementById('demo'); 
+  var gauge = new Gauge(target).setOptions(opts);
+
+  // Gán trường văn bản hiển thị giá trị
+  document.getElementById("preview-textfield").className = "preview-textfield";
+//   gauge.setTextField(document.getElementById("preview-textfield"));
+
+  // Thiết lập giá trị của gauge
+  gauge.maxValue = 4;
+  gauge.setMinValue(0);
+  gauge.set(0);
+
+  // Thiết lập tốc độ chuyển động
+  gauge.animationSpeed = 32;
 
 function handleChangedValue(event) {
     let data = event.target.value;
@@ -182,7 +229,7 @@ function handleChangedValue(event) {
     let n = valueString.length;
     if(valueString[n-1] === '\n'){
         string += valueString;
-        console.log(string);
+        // console.log(string);
         let arrString = string.split(/[ \t\r\n]+/);
         let stringResult = string.substring(string.indexOf(' ') + 1, string.length-1);
     
@@ -191,12 +238,12 @@ function handleChangedValue(event) {
         }
         if(arrString[0] === 'MAX4466'){
             let arr2Int = parseInt(arrString[2]);
-            let arr4Int = parseInt(arrString[4]);
+            let arr4Int = parseFloat(arrString[4]);
             if(checkFirstValue){
                 minMean = arr2Int;
                 maxMean = arr2Int;
-                minVariance = arr4Int;
-                maxVariance = arr4Int;
+                // minVariance = arr4Int;
+                // maxVariance = arr4Int;
                 checkFirstValue = false;
             }
             if(arr2Int < minMean){
@@ -205,36 +252,43 @@ function handleChangedValue(event) {
             if(arr2Int > maxMean){
                 maxMean = arr2Int;
             }
-            if(arr4Int < minVariance){
-                minVariance = arr4Int;
-            }
-            if(arr4Int > maxVariance){
-                maxVariance = arr4Int;
-            }
+            // if(arr4Int < minVariance){
+            //     minVariance = arr4Int;
+            // }
+            // if(arr4Int > maxVariance){
+            //     maxVariance = arr4Int;
+            // }
             TextAreaMinMean.value = minMean;
             TextAreaMaxMean.value = maxMean;
-            TextAreaMinVariance.value = minVariance;
-            TextAreaMaxVariance.value = maxVariance;
-            // console.log("Result:" + (maxVariance-minVariance));
-            // console.log("MinMena " + minMean + " MaxMean "+ maxMean + " MinVar " + minVariance + " MaxVar " + maxVariance);
+            // TextAreaMinVariance.value = minVariance;
+            // TextAreaMaxVariance.value = maxVariance;
+
             textAreaMAX.value = stringResult;
-            // console.log(stringResult);
-            // arrMean.push(arrString[2]);
             TextAreaMean.value = arrString[2];
-            // arrVariance.push(arrString[4]);
-            TextAreaVariance.value = arrString[4];
+            // TextAreaVariance.value = arrString[4];
+            if(arrString[4] === '0') {
+                textAreaMAX.value = "Not plugged in";
+                TextAreaMean.value = "";
+                TextAreaMinMean.value = "";
+                TextAreaMaxMean.value = "";
+                checkFirstValue = true;
+            }
+            let result = Math.log10(arr4Int).toFixed(2);
+            document.getElementById("preview-textfield").textContent = result;
+            gauge.set(result);
         }
 
         if(arrString[0] === 'MPU6050'){
             checkmessageMPU6050 = true;
             textAreaMPU.value = stringResult;
-            if(arrString[2] !== "error.") Ax.textContent = arrString[2];
+            if(arrString[2] !== "error." && arrString[2] !== "ok.") Ax.textContent = arrString[2];
             Ay.textContent = arrString[3];
             Az.textContent = arrString[4];
             Gx.textContent = arrString[6];
             Gy.textContent = arrString[7];
             Gz.textContent = arrString[8];
         }
+
         if(arrString[0] === 'APDS9960'){
             checkmessageAPDS9960 = true;
             if(arrString[1] === 'gesture'){
@@ -246,7 +300,7 @@ function handleChangedValue(event) {
             }
             else{
             textAreaAPDS.value = stringResult;
-            if(arrString[2] !== "error.")  R.textContent = arrString[2];
+            if(arrString[2] !== "error." && arrString[2] !== "ok.")  R.textContent = arrString[2];
             G.textContent = arrString[3];
             B.textContent = arrString[4];
             C.textContent = arrString[5];
