@@ -153,9 +153,10 @@ p{
   #R, #G, #B, #C{
     width: 28px;
   }
-  #textAreaMean, #textAreaMaxMean, #textAreaMinMean{
-    width: 58px;
-  }
+}
+
+#textAreaMean, #textAreaMaxMean, #textAreaMinMean{
+  width: 48px;
 }
 
 /* @media screen and (max-width: 500px) {
