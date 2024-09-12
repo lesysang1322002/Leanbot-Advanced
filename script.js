@@ -138,6 +138,7 @@ function ResetVariables(){
     Gx.textContent = "";
     Gy.textContent = "";
     Gz.textContent = "";
+    smoothVolume = 0;
 }
 
 let string = "";
@@ -188,38 +189,39 @@ var opts = {
     },
     staticLabels: {
       font: "10px sans-serif",
-      labels: [1, 2, 3],
-      fractionDigits: 2
+      labels: [10, 20, 30],
+      fractionDigits: 1
     },
     staticZones: [
-      { strokeStyle: "#30B32D", min: 0, max: 2 },
-      { strokeStyle: "#FFDD00", min: 2, max: 3 },
-      { strokeStyle: "#F03E3E", min: 3, max: 4 }
+      { strokeStyle: "#FFDD00", min: 0, max: 20 },
+      { strokeStyle: "#30B32D", min: 20, max: 30 },
+      { strokeStyle: "blue", min: 30, max: 40 }
     ],
     angle: 0.033,
     lineWidth: 0.30,
     radiusScale: 1.0,
     fontSize: 40,
     highDpiSupport: true
-  };
+};
 
-  // Khởi tạo gauge
-  var target = document.getElementById('demo'); 
-  var gauge = new Gauge(target).setOptions(opts);
+// Khởi tạo gauge
+var target = document.getElementById('demo'); 
+var gauge = new Gauge(target).setOptions(opts);
 
-  // Gán trường văn bản hiển thị giá trị
-  document.getElementById("preview-textfield").className = "preview-textfield";
-//   gauge.setTextField(document.getElementById("preview-textfield"));
+// Gán trường văn bản hiển thị giá trị
+document.getElementById("preview-textfield").className = "preview-textfield";
+// gauge.setTextField(document.getElementById("preview-textfield"));
 
-  // Thiết lập giá trị của gauge
-  gauge.maxValue = 4;
-  gauge.setMinValue(0);
-  gauge.set(0);
+// Thiết lập giá trị của gauge
+gauge.maxValue = 40;
+gauge.setMinValue(0);
+gauge.set(0);
 
-  // Thiết lập tốc độ chuyển động
-  gauge.animationSpeed = 32;
+// Thiết lập tốc độ chuyển động
+gauge.animationSpeed = 32;
 
-let maxVolume = 0;
+let volume;
+let smoothVolume = 0;
 
 function handleChangedValue(event) {
     let data = event.target.value;
@@ -272,17 +274,30 @@ function handleChangedValue(event) {
                 TextAreaMinMean.value = "";
                 TextAreaMaxMean.value = "";
                 checkFirstValue = true;
+                // Cập nhật màu cung tròn thành xám
+                gauge.options.staticZones = [
+                    { strokeStyle: "#808080", min: 0, max: gauge.maxValue } // Cả cung tròn có màu xám
+                ];
             }
-            let volume;
-            if(Variance > 0) volume = Math.log10(Variance).toFixed(2);
-            else volume = 0;
-            console.log("Variance: " + Variance + " Volume: " + volume);
-
-            if(volume > maxVolume) maxVolume = volume;
-            // console.log(maxVolume);
-
-            document.getElementById("preview-textfield").textContent = volume;
-            gauge.set(volume);
+            else{
+                gauge.options.staticZones = [
+                    { strokeStyle: "#FFDD00", min: 0, max: 20 },
+                    { strokeStyle: "#30B32D", min: 20, max: 30 },
+                    { strokeStyle: "#1E90FF", min: 30, max: 40 }
+                ];
+            }
+            if (Variance > 0) {
+                volume = 10 * Math.log10(Variance);
+            } else {
+                volume = 0;
+            }
+            smoothVolume += (volume - smoothVolume) / 2;
+            
+            // Hiển thị giá trị đã làm tròn trên giao diện
+            document.getElementById("preview-textfield").textContent = smoothVolume.toFixed(1);
+            
+            // Cập nhật gauge với giá trị không làm tròn để mượt mà hơn
+            gauge.set(smoothVolume);            
         }
 
         if(arrString[0] === 'MPU6050'){
