@@ -221,6 +221,7 @@ gauge.set(0);
 gauge.animationSpeed = 32;
 
 let volume;
+let minVolume;
 let smoothVolume = 0;
 
 function handleChangedValue(event) {
@@ -245,6 +246,7 @@ function handleChangedValue(event) {
                 minMean = arr2Int;
                 maxMean = arr2Int;
                 checkFirstValue = false;
+                minVolume = 10 * Math.log10(Variance);
             }
             if(arr2Int < minMean){
                 minMean = arr2Int
@@ -252,7 +254,7 @@ function handleChangedValue(event) {
             if(arr2Int > maxMean){
                 maxMean = arr2Int;
             }
-           
+
             TextAreaMinMean.value = minMean;
             TextAreaMaxMean.value = maxMean;
 
@@ -283,6 +285,11 @@ function handleChangedValue(event) {
                 volume = 0;
             }
             smoothVolume += (volume - smoothVolume) / 2;
+
+            if(smoothVolume < minVolume) {
+                minVolume = smoothVolume;
+            }
+            console.log(minVolume);
             
             // Hiển thị giá trị đã làm tròn trên giao diện
             document.getElementById("preview-textfield").textContent = smoothVolume.toFixed(1);
