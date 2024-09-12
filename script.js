@@ -289,7 +289,7 @@ function handleChangedValue(event) {
             if(smoothVolume < minVolume) {
                 minVolume = smoothVolume;
             }
-            console.log(minVolume);
+            console.log(minVolume.toFixed(1));
             
             // Hiển thị giá trị đã làm tròn trên giao diện
             document.getElementById("preview-textfield").textContent = smoothVolume.toFixed(1);
