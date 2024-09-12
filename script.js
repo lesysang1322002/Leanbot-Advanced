@@ -195,7 +195,7 @@ var opts = {
     staticZones: [
       { strokeStyle: "#FFDD00", min: 0, max: 20 },
       { strokeStyle: "#30B32D", min: 20, max: 30 },
-      { strokeStyle: "blue", min: 30, max: 40 }
+      { strokeStyle: "#1E90FF", min: 30, max: 40 }
     ],
     angle: 0.033,
     lineWidth: 0.30,
@@ -244,8 +244,6 @@ function handleChangedValue(event) {
             if(checkFirstValue){
                 minMean = arr2Int;
                 maxMean = arr2Int;
-                // minVariance = Variance;
-                // maxVariance = Variance;
                 checkFirstValue = false;
             }
             if(arr2Int < minMean){
@@ -254,16 +252,9 @@ function handleChangedValue(event) {
             if(arr2Int > maxMean){
                 maxMean = arr2Int;
             }
-            // if(Variance < minVariance){
-            //     minVariance = Variance;
-            // }
-            // if(Variance > maxVariance){
-            //     maxVariance = Variance;
-            // }
+           
             TextAreaMinMean.value = minMean;
             TextAreaMaxMean.value = maxMean;
-            // TextAreaMinVariance.value = minVariance;
-            // TextAreaMaxVariance.value = maxVariance;
 
             textAreaMAX.value = stringvolume;
             TextAreaMean.value = arrString[2];
