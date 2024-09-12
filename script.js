@@ -190,7 +190,7 @@ var opts = {
     staticLabels: {
       font: "10px sans-serif",
       labels: [10, 20, 30],
-      fractionDigits: 1
+      fractionDigits: 0
     },
     staticZones: [
       { strokeStyle: "#FFDD00", min: 0, max: 20 },
@@ -300,6 +300,8 @@ function handleChangedValue(event) {
             Gx.textContent = arrString[6];
             Gy.textContent = arrString[7];
             Gz.textContent = arrString[8];
+        
+            updateCubeRotation(parseFloat(arrString[6]), parseFloat(arrString[7]), parseFloat(arrString[8]));
         }
 
         if(arrString[0] === 'APDS9960'){
@@ -397,3 +399,65 @@ tabs.forEach(function(tab) {
         this.classList.add('active');
     });
 });
+
+let scene, camera, rendered, cube;
+
+function parentWidth(elem) {
+  return elem.parentElement.clientWidth;
+}
+
+function parentHeight(elem) {
+  return elem.parentElement.clientHeight;
+}
+
+function init3D(){
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0xffffff);
+
+  camera = new THREE.PerspectiveCamera(75, parentWidth(document.getElementById("3Dcube")) / parentHeight(document.getElementById("3Dcube")), 0.1, 1000);
+
+  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(parentWidth(document.getElementById("3Dcube")), parentHeight(document.getElementById("3Dcube")));
+
+  document.getElementById('3Dcube').appendChild(renderer.domElement);
+
+  // Tạo hình khối (geometry) và vật liệu
+  const geometry = new THREE.BoxGeometry(5, 2, 3);
+
+  var cubeMaterials = [
+    new THREE.MeshBasicMaterial({color: 0xff0000}),  // Đỏ
+    new THREE.MeshBasicMaterial({color: 0x00ff00}),  // Xanh lá cây
+    new THREE.MeshBasicMaterial({color: 0x0000ff}),  // Xanh dương
+    new THREE.MeshBasicMaterial({color: 0xffff00}),  // Vàng
+    new THREE.MeshBasicMaterial({color: 0xff00ff}),  // Tím
+    new THREE.MeshBasicMaterial({color: 0x00ffff})   // Xanh dương nhạt (cyan)
+  ];
+
+  const material = new THREE.MeshFaceMaterial(cubeMaterials);
+
+  // Tạo đối tượng cube và thêm vào scene
+  cube = new THREE.Mesh(geometry, material);
+  scene.add(cube);
+  camera.position.z = 5;
+  renderer.render(scene, camera);
+}
+
+// Hàm thay đổi kích thước đối tượng 3D khi cửa sổ thay đổi kích thước
+function onWindowResize(){
+  camera.aspect = parentWidth(document.getElementById("3Dcube")) / parentHeight(document.getElementById("3Dcube"));
+  camera.updateProjectionMatrix();
+  renderer.setSize(parentWidth(document.getElementById("3Dcube")), parentHeight(document.getElementById("3Dcube")));
+}
+
+window.addEventListener('resize', onWindowResize, false);
+
+// Khởi tạo mô hình 3D
+init3D();
+
+// Hàm để cập nhật góc xoay của cube với các giá trị Gx, Gy, Gz
+function updateCubeRotation(Gx, Gy, Gz) {
+  cube.rotation.x = Gx / 200;  // Áp dụng giá trị của Gy để xoay trên trục X
+  cube.rotation.y = Gy / 200;  // Áp dụng giá trị của Gz để xoay trên trục Y
+  cube.rotation.z = Gz / 200;  // Áp dụng giá trị của Gx để xoay trên trục Z
+  renderer.render(scene, camera);  // Vẽ lại scene với các cập nhật mới
+}
