@@ -142,17 +142,19 @@ p{
   display: flex;
   justify-content: space-around;
 }
+
 @media screen and (max-width: 1100px) {
   .form-group textarea{
     width: 35px;
     font-size: 9px;
     height: 22px;
   }
+
   #R, #G, #B, #C{
     width: 28px;
   }
-  #textAreaMean, #textAreaMaxMean, #textAreaMinMean, #textAreaVariance, #textAreaMinVariance, #textAreaMaxVariance{
-    width: 30px;
+  #textAreaMean, #textAreaMaxMean, #textAreaMinMean{
+    width: 58px;
   }
 }
 
