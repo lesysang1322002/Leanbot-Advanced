@@ -139,6 +139,7 @@ function ResetVariables(){
     Gy.textContent = "";
     Gz.textContent = "";
     smoothVolume = 0;
+    minVolume = 0;
 }
 
 let string = "";
