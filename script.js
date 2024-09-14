@@ -227,8 +227,8 @@ let smoothVolume = 0;
 let needCalibration = true;
 
 let gyroXerror = 19.5;
-let gyroYerror = 5.0;
-let gyroZerror = 1.5;
+let gyroYerror = 10.0;
+let gyroZerror = 1.8;
 
 // let timeGx = 110;
 // let timeGy = 110;
@@ -302,7 +302,7 @@ function handleChangedValue(event) {
             } else {
                 volume = 0;
             }
-            smoothVolume += (volume - smoothVolume) / 2;
+            smoothVolume += (volume - smoothVolume) / 8;
 
             if(smoothVolume < minVolume) {
                 minVolume = smoothVolume;
