@@ -364,7 +364,7 @@ function handleChangedValue(event) {
             if(Math.abs(gyroZ_temp) > maxGzError){
                 maxGzError = Math.abs(gyroZ_temp);
             }
-            console.log("maxGxError: " + maxGxError.toFixed(1) + " maxGyError: " + maxGyError.toFixed(1) + " maxGzError: " + maxGzError.toFixed(1));
+            // console.log("maxGxError: " + maxGxError.toFixed(1) + " maxGyError: " + maxGyError.toFixed(1) + " maxGzError: " + maxGzError.toFixed(1));
             if(Math.abs(gyroZ_temp) > gyroZerror){
                 cube.rotation.z += gyroZ_temp / 1000;
             }
