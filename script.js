@@ -324,54 +324,18 @@ function handleChangedValue(event) {
             Gx.textContent = arrString[6];
             Gy.textContent = arrString[7];
             Gz.textContent = arrString[8];
-            // let currentTime = Date.now();
-            // let time = currentTime - lastTime;
-            // lastTime = currentTime;
-
-            // sumGxError += toRadians(Math.abs(parseInt(arrString[6])));
-            // sumGyError += toRadians(Math.abs(parseInt(arrString[7])));
-            // sumGzError += toRadians(Math.abs(parseInt(arrString[8])));
-            // count++;
-            // if(count === 100){
-            //     gyroXerror = sumGxError / 100;
-            //     gyroYerror = sumGyError / 100;
-            //     gyroZerror = sumGzError / 100;
-            //     count = 0;
-            //     sumGxError = 0;
-            //     sumGyError = 0;
-            //     sumGzError = 0;
-            //     console.log("gyroXerror: " + gyroXerror + " gyroYerror: " + gyroYerror + " gyroZerror: " + gyroZerror);
-            // }
-           
-
-            let gyroX_temp = toRadians(parseInt(arrString[6]));
-            if(Math.abs(gyroX_temp) > maxGxError){
-                maxGxError = Math.abs(gyroX_temp);
-            }
-            if(Math.abs(gyroX_temp) > gyroXerror){
-                cube.rotation.x += gyroX_temp / 1250 ;
-            }
-
-            let gyroY_temp = toRadians(parseInt(arrString[7]));
-            if(Math.abs(gyroY_temp) > maxGyError){
-                maxGyError = Math.abs(gyroY_temp);
-            }
-            if(Math.abs(gyroY_temp) > gyroYerror){
-                cube.rotation.y += gyroY_temp / 1200;
-            }
-
-            let gyroZ_temp = toRadians(parseInt(arrString[8]));
-            if(Math.abs(gyroZ_temp) > maxGzError){
-                maxGzError = Math.abs(gyroZ_temp);
-            }
-            // console.log("maxGxError: " + maxGxError.toFixed(1) + " maxGyError: " + maxGyError.toFixed(1) + " maxGzError: " + maxGzError.toFixed(1));
-            if(Math.abs(gyroZ_temp) > gyroZerror){
-                cube.rotation.z += gyroZ_temp / 1000;
-            }
-
-            // console.log("gyroX: " + gyroX_temp + " gyroY: " + gyroY_temp + " gyroZ: " + gyroZ_temp);
-
+            
+            if(arrString[9] === 'Qwxyz' ) {
+            let w, x, y, z;
+            w = parseFloat(arrString[10]);
+            x = parseFloat(arrString[11]);
+            y = parseFloat(arrString[12]);
+            z = parseFloat(arrString[13]);
+            console.log("w: " + w + " x: " + x + " y: " + y + " z: " + z);
+            var quaternion = new THREE.Quaternion(-x, z, y, w);
+            cube.quaternion.copy(quaternion);
             renderer.render(scene, camera);
+            }
         }
         
         if(arrString[0] === 'APDS9960'){
@@ -496,7 +460,7 @@ function init3D(){
   document.getElementById('3Dcube').appendChild(renderer.domElement);
 
   // Tạo hình khối (geometry) và vật liệu
-  const geometry = new THREE.BoxGeometry(3, 5, 2);
+  const geometry = new THREE.BoxGeometry(12/4, 7/4, 18/4);
 
   var cubeMaterials = [
     new THREE.MeshBasicMaterial({color: 0xff0000}),  // Đỏ
@@ -512,7 +476,8 @@ function init3D(){
   // Tạo đối tượng cube và thêm vào scene
   cube = new THREE.Mesh(geometry, material);
   scene.add(cube);
-  camera.position.z = 5;
+  camera.position.set(4, 3, -4); 
+  camera.lookAt(0, 0, 0);
   renderer.render(scene, camera);
 }
 

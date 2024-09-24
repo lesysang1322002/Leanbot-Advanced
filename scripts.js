@@ -522,7 +522,10 @@ function init3D(){
   // Tạo đối tượng cube và thêm vào scene
   cube = new THREE.Mesh(geometry, material);
   scene.add(cube);
-  camera.position.z = 5;
+  // Đặt vị trí của camera (x, y, z)
+  camera.position.set(4, 3, -4); 
+  // Hướng camera nhìn về tâm của hình hộp 
+  camera.lookAt(0, 0, 0);
   renderer.render(scene, camera);
 }
 
