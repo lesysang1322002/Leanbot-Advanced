@@ -318,7 +318,7 @@ function handleChangedValue(event) {
         if(arrString[0] === 'MPU6050'){
             checkmessageMPU6050 = true;
             textAreaMPU.value = stringvolume;
-            if(arrString[2] !== "error." && arrString[2] !== "ok.") {
+            if(arrString[2] !== "error" && arrString[2] !== "ok") {
 
             Ax.textContent = arrString[2];
             Ay.textContent = arrString[3];
@@ -354,7 +354,7 @@ function handleChangedValue(event) {
             }
             else{
             textAreaAPDS.value = stringvolume;
-            if(arrString[2] !== "error." && arrString[2] !== "ok.")  R.textContent = arrString[2];
+            if(arrString[2] !== "error" && arrString[2] !== "ok")  R.textContent = arrString[2];
             G.textContent = arrString[3];
             B.textContent = arrString[4];
             C.textContent = arrString[5];
