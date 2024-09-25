@@ -345,8 +345,8 @@ function handleChangedValue(event) {
         
         if(arrString[0] === 'APDS9960'){
             checkmessageAPDS9960 = true;
-            if(arrString[1] === 'gesture'){
-                TextAreaGesture.value = arrString[2];
+            if(arrString[6] === 'Prox'){
+                TextAreaGesture.value = arrString[7];
                 clearTimeout(timeoutId);
                 timeoutId = setTimeout(() => {
                     TextAreaGesture.value = '';
