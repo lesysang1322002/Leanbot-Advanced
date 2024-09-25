@@ -280,7 +280,9 @@ function handleChangedValue(event) {
             TextAreaMean.value = arrString[2];
             // TextAreaVariance.value = arrString[4];
             if(arrString[4] === '0') {
-                textAreaMAX.value = "Not plugged in";
+                if(!checkFirstValue) {
+                    textAreaMAX.value = "Not plugged in";
+                }
                 TextAreaMean.value = "";
                 TextAreaMinMean.value = "";
                 TextAreaMaxMean.value = "";
@@ -345,8 +347,8 @@ function handleChangedValue(event) {
         
         if(arrString[0] === 'APDS9960'){
             checkmessageAPDS9960 = true;
-            if(arrString[6] === 'Prox'){
-                TextAreaGesture.value = arrString[7];
+            if(arrString[6] === 'gesture'){
+                TextAreaGesture.value = arrString[2];
                 clearTimeout(timeoutId);
                 timeoutId = setTimeout(() => {
                     TextAreaGesture.value = '';
