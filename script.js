@@ -250,7 +250,7 @@ function handleChangedValue(event) {
     let n = valueString.length;
     if(valueString[n-1] === '\n'){
         string += valueString;
-        // console.log(string);
+        console.log(string);
         let arrString = string.split(/[ \t\r\n]+/);
         let stringvolume = string.substring(string.indexOf(' ') + 1, string.length-1);
     
@@ -318,7 +318,9 @@ function handleChangedValue(event) {
         if(arrString[0] === 'MPU6050'){
             checkmessageMPU6050 = true;
             textAreaMPU.value = stringvolume;
-            if(arrString[2] !== "error." && arrString[2] !== "ok.") Ax.textContent = arrString[2];
+            if(arrString[2] !== "error." && arrString[2] !== "ok.") {
+
+            Ax.textContent = arrString[2];
             Ay.textContent = arrString[3];
             Az.textContent = arrString[4];
             Gx.textContent = arrString[6];
@@ -327,14 +329,17 @@ function handleChangedValue(event) {
             
             if(arrString[9] === 'Qwxyz' ) {
             let w, x, y, z;
-            w = parseFloat(arrString[10]);
-            x = parseFloat(arrString[11]);
-            y = parseFloat(arrString[12]);
-            z = parseFloat(arrString[13]);
-            console.log("w: " + w + " x: " + x + " y: " + y + " z: " + z);
+            let scaleFactor = 16384.0;  
+
+            w = parseFloat(arrString[10]) / scaleFactor;
+            x = parseFloat(arrString[11]) / scaleFactor;
+            y = parseFloat(arrString[12]) / scaleFactor;
+            z = parseFloat(arrString[13]) / scaleFactor;            
+            // console.log("w: " + w + " x: " + x + " y: " + y + " z: " + z);
             var quaternion = new THREE.Quaternion(-x, z, y, w);
             cube.quaternion.copy(quaternion);
             renderer.render(scene, camera);
+             }
             }
         }
         

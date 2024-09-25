@@ -3,7 +3,7 @@
  
 #define   MPU6050_INCLUDE_DMP_MOTIONAPPS20
 #include "MPU6050.h"
-#include "MPU6050_6Axis_MotionApps20.h"
+#include "MPU6050_6Axis_MotionApps_V6_12.h"
 
 MPU6050 mpu;
   
@@ -11,32 +11,16 @@ void setup() {
   Leanbot.begin();
   Wire.begin();
   Wire.setClock(400000);        
-  
-  mpu.initialize();
-  if ( mpu.testConnection() && mpu.dmpInitialize() == 0) {
-    mpu.setDMPEnabled(true);
-    waitUntilNextBLESend();
-    Serial.println(F( "MPU6050 Init ok." ));
-  } else {
-    waitUntilNextBLESend();
-    Serial.println(F( "MPU6050 Init error." ));
-  }
- 
-  if (APDS.begin()) {
-    waitUntilNextBLESend();
-    Serial.println(F( "APDS9960 Init ok." ));
-  } else {
-    waitUntilNextBLESend();
-    Serial.println(F( "APDS9960 Init error." ));
-  }
+  MPU6050_begin();
+  APDS9960_begin();
+  unsigned long startTime = millis();
 }
  
  
 void loop() {
-  waitUntilNextBLESend();
   MPU6050_Print();
-  APDS9960_Print();
-  MAX4466_Print();
+  // APDS9960_Print();
+  // MAX4466_Print();
 }
  
 void  APDS9960_Print(){
@@ -96,7 +80,8 @@ void MAX4466_Print() {
  
   long Mean = 512 + sum / N_SAMPLES;
   long Var = (ssum - ((sum * sum) / N_SAMPLES)) / N_SAMPLES;
- 
+  
+  waitUntilNextBLESend();
   Serial.print(F("MAX4466 Mean: "));
   Serial.print(Mean);
   Serial.print(F(" Variance: "));
@@ -104,39 +89,60 @@ void MAX4466_Print() {
 }
  
 void MPU6050_Print(){
-  if(mpu.testConnection()){
-    int ax, ay, az;
-    int gx, gy, gz;
- 
-    mpu.getAcceleration(&ax, &ay, &az);
-    mpu.getRotation(&gx, &gy, &gz);
-    waitUntilNextBLESend();
- 
-    Serial.print(F( "MPU6050   Axyz " ));
-    Serial_printtb(ax);
-    Serial_printtb(ay);
-    Serial_printtb(az);
-    Serial.print("Gxyz ");
-    Serial_printtb(gx);
-    Serial_printtb(gy);
-    Serial.printtb(gz);
-  }
-
   uint8_t fifoBuffer[64];  
-  Quaternion q;             
+  VectorInt16 a, g;
+  Quaternion q;  
 
   if (mpu.dmpGetCurrentFIFOPacket(fifoBuffer)) {
+    mpu.dmpGetAccel(&a, fifoBuffer);
+    waitUntilNextBLESend();
+    Serial.print(F( "MPU6050 Axyz " ));
+    Serial_printtb(a.x);
+    Serial_printtb(a.y);
+    Serial_printtb(a.z);
+    mpu.dmpGetGyro(&g, fifoBuffer);
+    Serial.print(F( "Gxyz " ));    
+    Serial_printtb(g.x);
+    Serial_printtb(g.y);
+    Serial_printtb(g.z);
     mpu.dmpGetQuaternion(&q, fifoBuffer);
-    Serial.print("Quaternion ");
-    Serial.print(q.w); Serial.print("\t");
-    Serial.print(q.x); Serial.print("\t");
-    Serial.print(q.y); Serial.print("\t");
+    Serial.print(F( "Qwxyz " ));    
+    Serial_printtb(q.w); 
+    Serial_printtb(q.x);
+    Serial_printtb(q.y);
     Serial.println(q.z);
-    delay(50);
+  }
+  else{
+    unsigned long endTime = millis(); 
+    Serial.print(F("No FiFo data after: "));
+    Serial.println(endTime - startTime);
+  }
+}
+
+void MPU6050_begin(){
+    mpu.initialize();
+  if ( mpu.testConnection() && mpu.dmpInitialize() == 0) {
+    mpu.setDMPEnabled(true);
+    waitUntilNextBLESend();
+    Serial.println(F( "MPU6050 Init ok." ));
+  } else {
+    waitUntilNextBLESend();
+    Serial.println(F( "MPU6050 Init error." ));
+  }
+}
+
+void APDS9960_begin(){
+  if (APDS.begin()) {
+    waitUntilNextBLESend();
+    Serial.println(F( "APDS9960 Init ok." ));
+  } else {
+    waitUntilNextBLESend();
+    Serial.println(F( "APDS9960 Init error." ));
   }
 }
  
-void Serial_printtb(int a) {
+template <typename T>
+void Serial_printtb(T a) {
   Serial.print(a);
   Serial.print('\t');
 }
