@@ -123,9 +123,10 @@ function ResetVariables(){
     textAreaMAX.value = "";
     TextAreaGesture.value = "";
     TextAreaMean.value = "";
-    // TextAreaVariance.value = "";
-    // TextAreaMinVariance.value = "";
-    // TextAreaMaxVariance.value = "";
+
+    TextAreaProximity.value = "";
+    TextAreaTemperature.value = "";
+
     TextAreaMinMean.value = "";
     TextAreaMaxMean.value = "";
     R.textContent = "";
@@ -153,6 +154,10 @@ let TextAreaMean = document.getElementById("textAreaMean");
 // let TextAreaMaxVariance = document.getElementById("textAreaMaxVariance");
 let TextAreaMinMean = document.getElementById("textAreaMinMean");
 let TextAreaMaxMean = document.getElementById("textAreaMaxMean");
+
+let TextAreaProximity = document.getElementById("textAreaProx");
+let TextAreaTemperature = document.getElementById("textAreaTemp");
+
 let R = document.getElementById("R");
 let G = document.getElementById("G");
 let B = document.getElementById("B");
@@ -328,6 +333,8 @@ function handleChangedValue(event) {
             Gx.textContent = arrString[6];
             Gy.textContent = arrString[7];
             Gz.textContent = arrString[8];
+
+            TextAreaTemperature.value = arrString[15];
             
             if(arrString[9] === 'Qwxyz' ) {
             let w, x, y, z;
@@ -347,7 +354,7 @@ function handleChangedValue(event) {
         
         if(arrString[0] === 'APDS9960'){
             checkmessageAPDS9960 = true;
-            if(arrString[6] === 'gesture'){
+            if(arrString[1] === 'gesture'){
                 TextAreaGesture.value = arrString[2];
                 clearTimeout(timeoutId);
                 timeoutId = setTimeout(() => {
@@ -356,10 +363,13 @@ function handleChangedValue(event) {
             }
             else{
             textAreaAPDS.value = stringvolume;
-            if(arrString[2] !== "error" && arrString[2] !== "ok")  R.textContent = arrString[2];
+            if(arrString[2] !== "error" && arrString[2] !== "ok"){
+            R.textContent = arrString[2];
             G.textContent = arrString[3];
             B.textContent = arrString[4];
             C.textContent = arrString[5];
+            TextAreaProximity.value = arrString[7];
+            }
             }
         }
         if(checkmessageMPU6050 && checkmessageAPDS9960){
