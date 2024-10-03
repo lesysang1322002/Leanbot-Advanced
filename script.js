@@ -139,6 +139,14 @@ function ResetVariables(){
     Gx.textContent = "";
     Gy.textContent = "";
     Gz.textContent = "";
+    Qx.textContent = "";
+    Qy.textContent = "";
+    Qz.textContent = "";
+    Qw.textContent = "";
+    coutUP = 0;
+    countDOWN = 0;
+    countLEFT = 0;
+    countRIGHT = 0;
     smoothVolume = 0;
     minVolume = 0;
 }
@@ -155,7 +163,7 @@ let TextAreaMean = document.getElementById("textAreaMean");
 let TextAreaMinMean = document.getElementById("textAreaMinMean");
 let TextAreaMaxMean = document.getElementById("textAreaMaxMean");
 
-let TextAreaProximity = document.getElementById("textAreaProx");
+let TextAreaProximity = document.getElementById("proximityValue");
 let TextAreaTemperature = document.getElementById("textAreaTemp");
 
 let R = document.getElementById("R");
@@ -168,6 +176,10 @@ let Az = document.getElementById("Az");
 let Gx = document.getElementById("Gx");
 let Gy = document.getElementById("Gy");
 let Gz = document.getElementById("Gz");
+let Qx = document.getElementById("Qx");
+let Qy = document.getElementById("Qy");
+let Qz = document.getElementById("Qz");
+let Qw = document.getElementById("Qw");
 
 let stringcheck = "";
 let timeoutId;
@@ -199,10 +211,10 @@ var opts = {
       fractionDigits: 0
     },
     staticZones: [
-      { strokeStyle: "#FFDD00", min: 0, max: 20 },
-      { strokeStyle: "#30B32D", min: 20, max: 30 },
-      { strokeStyle: "#1E90FF", min: 30, max: 40 }
-    ],
+        { strokeStyle: "#FFA500", min: 0, max: 20 },  // Cam (Orange)
+        { strokeStyle: "#FFFF00", min: 20, max: 30 }, // Vàng (Yellow)
+        { strokeStyle: "#30B32D", min: 30, max: 40 }  // Xanh Lá (Green)
+    ],      
     angle: 0.033,
     lineWidth: 0.30,
     radiusScale: 1.0,
@@ -235,17 +247,13 @@ let gyroXerror = 19.5;
 let gyroYerror = 10.0;
 let gyroZerror = 1.8;
 
-// let timeGx = 110;
-// let timeGy = 110;
-// let timeGz = 110;
-// let lastTime = Date.now();
-// let sumGxError = 0;
-// let sumGyError = 0;
-// let sumGzError = 0;
-// let count = 0;
 let maxGxError = 0;
 let maxGyError = 0;
 let maxGzError = 0;
+const progressProx = document.getElementById('progressProx');
+
+let countUP = 0, countDOWN = 0, countLEFT = 0, countRIGHT = 0;
+
 
 function handleChangedValue(event) {
     let data = event.target.value;
@@ -255,7 +263,7 @@ function handleChangedValue(event) {
     let n = valueString.length;
     if(valueString[n-1] === '\n'){
         string += valueString;
-        console.log(string);
+        // console.log(string);
         let arrString = string.split(/[ \t\r\n]+/);
         let stringvolume = string.substring(string.indexOf(' ') + 1, string.length-1);
     
@@ -299,9 +307,9 @@ function handleChangedValue(event) {
             }
             else{
                 gauge.options.staticZones = [
-                    { strokeStyle: "#FFDD00", min: 0, max: 20 },
-                    { strokeStyle: "#30B32D", min: 20, max: 30 },
-                    { strokeStyle: "#1E90FF", min: 30, max: 40 }
+                    { strokeStyle: "#FFA500", min: 0, max: 20 },  // Cam (Orange)
+                    { strokeStyle: "#FFFF00", min: 20, max: 30 }, // Vàng (Yellow)
+                    { strokeStyle: "#30B32D", min: 30, max: 40 }  // Xanh Lá (Green)
                 ];
             }
             if (Variance > 0) {
@@ -343,8 +351,13 @@ function handleChangedValue(event) {
             w = parseFloat(arrString[10]) / scaleFactor;
             x = parseFloat(arrString[11]) / scaleFactor;
             y = parseFloat(arrString[12]) / scaleFactor;
-            z = parseFloat(arrString[13]) / scaleFactor;            
-            // console.log("w: " + w + " x: " + x + " y: " + y + " z: " + z);
+            z = parseFloat(arrString[13]) / scaleFactor;     
+
+            Qw.textContent = w.toFixed(2);
+            Qx.textContent = x.toFixed(2);
+            Qy.textContent = y.toFixed(2);
+            Qz.textContent = z.toFixed(2);        
+
             var quaternion = new THREE.Quaternion(-x, z, y, w);
             cube.quaternion.copy(quaternion);
             renderer.render(scene, camera);
@@ -354,13 +367,78 @@ function handleChangedValue(event) {
         
         if(arrString[0] === 'APDS9960'){
             checkmessageAPDS9960 = true;
-            if(arrString[1] === 'gesture'){
-                TextAreaGesture.value = arrString[2];
-                clearTimeout(timeoutId);
-                timeoutId = setTimeout(() => {
-                    TextAreaGesture.value = '';
-                }, 10000);
-            }
+            if (arrString[1] === 'gesture' || arrString[9] === 'gesture') {
+
+                if(arrString[1] === 'gesture') {
+                    let gesture = arrString[2];
+                }
+                else {
+                    let gesture = arrString[10];
+                }
+
+                const btnUp = document.getElementById('btnUp');
+                const btnLeft = document.getElementById('btnLeft');
+                const btnRight = document.getElementById('btnRight');
+                const btnDown = document.getElementById('btnDown');
+
+                btnUp.style.transition = 'none'; 
+                btnLeft.style.transition = 'none';
+                btnRight.style.transition = 'none';
+                btnDown.style.transition = 'none';
+               
+                if (gesture === 'UP') {
+                    btnUp.style.backgroundColor = 'red'; // Đặt màu đỏ ngay lập tức
+                    countUP++;
+                
+                    let paragraph = btnUp.querySelector('h5');
+                    if (paragraph) {
+                        paragraph.innerHTML = "UP" + "<br>" + countUP;
+                    }
+                
+                    // Sau 2 giây, bắt đầu mờ dần
+                    setTimeout(() => {
+                        btnUp.style.transition = 'background-color 5s ease'; // Thêm hiệu ứng mờ dần
+                        btnUp.style.backgroundColor = 'transparent'; // Chuyển dần sang trong suốt
+                    }, 2000);
+                
+                    console.log("UP");
+                }
+                
+                else if (gesture === 'LEFT') {
+                    btnLeft.style.backgroundColor = 'red';
+                    countLEFT++;
+                    let paragraph = btnLeft.querySelector('h5');
+                    paragraph.innerHTML = "LEFT" + "<br>" + countLEFT;
+
+                    setTimeout(() => {
+                        btnLeft.style.transition = 'background-color 5s ease'; // Thêm hiệu ứng mờ dần
+                        btnLeft.style.backgroundColor = 'transparent';
+                    }, 1000);
+                    console.log("LEFT");
+                } else if (gesture === 'RIGHT') {
+                    btnRight.style.backgroundColor = 'red';
+                    countRIGHT++;
+                    let paragraph = btnRight.querySelector('h5');
+                    paragraph.innerHTML = "RIGHT" + "<br>" + countRIGHT;
+
+                    setTimeout(() => {
+                        btnRight.style.transition = 'background-color 5s ease'; // Thêm hiệu ứng mờ dần
+                        btnRight.style.backgroundColor = 'transparent';
+                    }, 1000);
+                    console.log("RIGHT");
+                } else if (gesture === 'DOWN') {
+                    btnDown.style.backgroundColor = 'red';
+                    countDOWN++;
+                    let paragraph = btnDown.querySelector('h5');
+                    paragraph.innerHTML = "DOWN" + "<br>" + countDOWN;
+
+                    setTimeout(() => {
+                        btnDown.style.transition = 'background-color 5s ease'; // Thêm hiệu ứng mờ dần
+                        btnDown.style.backgroundColor = 'transparent';
+                    }, 1000);
+                    console.log("DOWN");
+                }
+            } 
             else{
             textAreaAPDS.value = stringvolume;
             if(arrString[2] !== "error" && arrString[2] !== "ok"){
@@ -368,7 +446,14 @@ function handleChangedValue(event) {
             G.textContent = arrString[3];
             B.textContent = arrString[4];
             C.textContent = arrString[5];
-            TextAreaProximity.value = arrString[7];
+            progressProx.value = arrString[7];
+            document.getElementById("proximityValue").innerText = arrString[7];
+
+            let rValue = parseInt(arrString[2]);
+            let gValue = parseInt(arrString[3]);
+            let bValue = parseInt(arrString[4]);
+
+            colorSquare.style.backgroundColor = `rgb(${rValue}, ${gValue}, ${bValue})`;
             }
             }
         }

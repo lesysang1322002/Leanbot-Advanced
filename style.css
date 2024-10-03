@@ -75,30 +75,78 @@ body {
 body h6 {
   font-size: 12px;
 }
+
 footer {
   background-color: #343a40;
   color: #fff;
 }
+
 .center-text {
   text-align: center;
   color: #333; /* Màu sắc văn bản tùy chọn */
   font-size: 24px; /* Kích thước font tùy chọn */
 }
+
+body h5{
+  font-size: 15px;
+  font-weight: bold;
+  text-align: center;
+}
+
 p{
   font-size:15px;
   margin: 0;
   font-weight: bold;
   text-align: center;
 }
+
 .openLinkCode{
   position: fixed;
   bottom: 0;
   width: 100vw;
   text-align: center;
 }
-#R, #G, #B, #C{
-  width: 42px;
+
+#R, #G, #B, #C, #textAreaQwxyz, #Prox, #textAreaMean, #textAreaMaxMean, #textAreaMinMean, #Qw, #Qx, #Qy, #Qz{
+  width: 50px;
+  height: 30px;
+  resize: none;
+  text-align: center;
+  font-size: 14px;
+  border: 2px solid #ccc;
+  border-radius: 3px;
 }
+
+#H{
+  border: none;
+  background-color: #f0f0f0;
+}
+
+#Qw, #Qx, #Qy, #Qz{
+  width: 50px;
+}
+
+#textAreaQwxyz{
+  width: 200px;
+}
+
+#colorSquare {
+  width: 55px;
+  height: auto;
+  background-color: rgb(255, 255, 255); /* Màu trắng */
+  border: 1px solid #FFF; /* Đường viền trắng */
+  margin-bottom: 18px;
+}
+
+.gesture-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 5px;
+  text-align: center;
+}
+
 .sensor-name {
   text-align: center;
   margin-bottom: 5px;
@@ -106,7 +154,6 @@ p{
 
 .sensor-value {
   border: 3px solid #ccc;
-  padding: 10px;
   resize: none;
   text-align: center;
   white-space: nowrap;
@@ -128,9 +175,9 @@ p{
   margin-bottom: 0px;
 }
 .form-group textarea {
-  flex: 1;
+  /* flex: 1; */
+  width: 50px;
   height: 30px;
-  width: 60px;
   resize: none;
   text-align: center;
   font-size: 14px;
@@ -141,6 +188,36 @@ p{
   padding-top: 10px;
   display: flex;
   justify-content: space-around;
+}
+
+#btnUp,#btnDown {
+  width: 85px;
+  height: 55px;
+  font-size: 16px;
+  border-radius: 5px;
+  border: 2px solid #ccc;
+  background-color: #f0f0f0;
+  margin: 10px; /* Thêm margin để có khoảng cách với các nút khác */
+}
+
+#btnLeft, #btnRight {
+  width: 85px;
+  height: 55px;
+  font-size: 16px;
+  border-radius: 5px;
+  border: 2px solid #ccc;
+  background-color: #f0f0f0;
+  margin: 0 10px; /* Khoảng cách bên trái và bên phải */
+}
+
+.fade-out {
+  transition: background-color 10s ease; /* Mờ dần trong 2 giây */
+  background-color: transparent; /* Trạng thái cuối cùng là trong suốt */
+}
+
+
+.row:nth-child(2) p {
+  margin: 0 20px; /* Khoảng cách giữa chữ Gesture và các nút */
 }
 
 @media screen and (max-width: 1100px) {
@@ -155,8 +232,10 @@ p{
   }
 }
 
-#textAreaMean, #textAreaMaxMean, #textAreaMinMean{
-  width: 48px;
+#progressProx{
+  width: 100%;
+  height: 20px;
+  margin-top: 5px;
 }
 
 .cube-content{
@@ -166,17 +245,6 @@ p{
   padding-top:2%;
 }
 
-/* @media screen and (max-width: 500px) {
-    .sensor-value {
-        width: 300px;
-    }
-    .container {
-        width: 100%;
-    }
-    .module-title {
-        font-size: 16px;
-    }
-}  */
 .container {
   display: flex;
   flex-wrap: wrap;
@@ -227,4 +295,8 @@ p{
   #R, #G, #B, #C{
     width: 42px;
   }
+}
+
+#textAreaTemp {
+  width: 50px !important; /* Đảm bảo chiều rộng của textarea được ưu tiên */
 }
