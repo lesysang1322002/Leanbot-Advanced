@@ -367,13 +367,13 @@ function handleChangedValue(event) {
         
         if(arrString[0] === 'APDS9960'){
             checkmessageAPDS9960 = true;
-            if (arrString[1] === 'gesture' || arrString[9] === 'gesture') {
+            if (arrString[1] === 'gesture' || arrString[8] === 'gesture') {
 
                 if(arrString[1] === 'gesture') {
                     let gesture = arrString[2];
                 }
                 else {
-                    let gesture = arrString[10];
+                    let gesture = arrString[9];
                 }
 
                 const btnUp = document.getElementById('btnUp');
