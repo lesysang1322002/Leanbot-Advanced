@@ -238,6 +238,10 @@ p{
   margin-top: 5px;
 }
 
+#ICTemp{
+  height: 30px;
+}
+
 .cube-content{
   width: 100%;
   background-color: white;
