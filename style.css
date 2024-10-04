@@ -107,11 +107,10 @@ p{
   text-align: center;
 }
 
-#R, #G, #B, #C, #textAreaQwxyz, #Prox, #textAreaMean, #textAreaMaxMean, #textAreaMinMean, #Qw, #Qx, #Qy, #Qz{
-  width: 50px;
+#R, #G, #B, #C, #textAreaQwxyz, #proximityValue, #Qw, #Qx, #Qy, #Qz, #Ax, #Ay, #Az, #Gx, #Gy, #Gz, #textAreaMean, #textAreaMaxMean, #textAreaMinMean, #textAreaVariance, #textAreaMaxVariance,  #textAreaMinVariance{
   height: 30px;
   resize: none;
-  text-align: center;
+  text-align: right;
   font-size: 14px;
   border: 2px solid #ccc;
   border-radius: 3px;
@@ -120,14 +119,6 @@ p{
 #H{
   border: none;
   background-color: #f0f0f0;
-}
-
-#Qw, #Qx, #Qy, #Qz{
-  width: 50px;
-}
-
-#textAreaQwxyz{
-  width: 200px;
 }
 
 #colorSquare {
@@ -156,7 +147,7 @@ p{
   border: 3px solid #ccc;
   resize: none;
   text-align: center;
-  white-space: nowrap;
+  white-space: normal; /* Để nội dung tự động xuống dòng */
   border-radius: 5px;
 }
 
@@ -184,11 +175,26 @@ p{
   border: 2px solid #ccc;
   border-radius: 3px;
 }
+
 .row{
   padding-top: 10px;
   display: flex;
   justify-content: space-around;
 }
+
+.row-gap {
+  padding-top: 10px;
+  display: flex;
+  justify-content: space-around;
+  gap: 8px; /* Chỉ thêm khoảng cách 20px giữa các cột trong row này */
+}
+
+.row-gap2 {
+  padding-top: 10px;
+  display: flex;
+  gap: 1px; /* Chỉ thêm khoảng cách 20px giữa các cột trong row này */
+}
+
 
 #btnUp,#btnDown {
   width: 85px;
@@ -302,5 +308,6 @@ p{
 }
 
 #textAreaTemp {
-  width: 50px !important; /* Đảm bảo chiều rộng của textarea được ưu tiên */
+  width: 70px !important; /* Đảm bảo chiều rộng của textarea được ưu tiên */
+  text-align: right;
 }

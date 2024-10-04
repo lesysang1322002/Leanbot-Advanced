@@ -157,9 +157,9 @@ let textAreaMPU = document.getElementById("textAreaMPU");
 let textAreaMAX = document.getElementById("textAreaMAX");
 let TextAreaGesture = document.getElementById("textAreaGesture");
 let TextAreaMean = document.getElementById("textAreaMean");
-// let TextAreaVariance = document.getElementById("textAreaVariance");
-// let TextAreaMinVariance = document.getElementById("textAreaMinVariance");
-// let TextAreaMaxVariance = document.getElementById("textAreaMaxVariance");
+let TextAreaVariance = document.getElementById("textAreaVariance");
+let TextAreaMinVariance = document.getElementById("textAreaMinVariance");
+let TextAreaMaxVariance = document.getElementById("textAreaMaxVariance");
 let TextAreaMinMean = document.getElementById("textAreaMinMean");
 let TextAreaMaxMean = document.getElementById("textAreaMaxMean");
 
@@ -276,22 +276,33 @@ function handleChangedValue(event) {
             if(checkFirstValue){
                 minMean = arr2Int;
                 maxMean = arr2Int;
+                minVariance = Variance;
+                maxVariance = Variance;
                 checkFirstValue = false;
                 minVolume = 10 * Math.log10(Variance);
             }
             if(arr2Int < minMean){
-                minMean = arr2Int
+                minMean = arr2Int;
             }
             if(arr2Int > maxMean){
                 maxMean = arr2Int;
             }
+            if(Variance < minVariance){
+                minVariance = Variance;
+            }
+            if(Variance > maxVariance){
+                maxVariance = Variance;
+            }
+
+            TextAreaMinVariance.value = minVariance;
+            TextAreaMaxVariance.value = maxVariance;
 
             TextAreaMinMean.value = minMean;
             TextAreaMaxMean.value = maxMean;
 
             textAreaMAX.value = stringvolume;
             TextAreaMean.value = arrString[2];
-            // TextAreaVariance.value = arrString[4];
+            TextAreaVariance.value = arrString[4];
             if(arrString[4] === '0') {
                 if(!checkFirstValue) {
                     textAreaMAX.value = "Not plugged in";
@@ -342,7 +353,7 @@ function handleChangedValue(event) {
             Gy.textContent = arrString[7];
             Gz.textContent = arrString[8];
 
-            TextAreaTemperature.value = arrString[15];
+            TextAreaTemperature.value = arrString[15] + "°C";
             
             if(arrString[9] === 'Qwxyz' ) {
             let w, x, y, z;
