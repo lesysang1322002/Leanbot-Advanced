@@ -253,6 +253,7 @@ let maxGzError = 0;
 const progressProx = document.getElementById('progressProx');
 
 let countUP = 0, countDOWN = 0, countLEFT = 0, countRIGHT = 0;
+let RGBmax = 0;
 
 
 function handleChangedValue(event) {
@@ -354,7 +355,7 @@ function handleChangedValue(event) {
             Gz.textContent = arrString[8];
 
             TextAreaTemperature.value = arrString[15] + "°C";
-            
+
             if(arrString[9] === 'Qwxyz' ) {
             let w, x, y, z;
             let scaleFactor = 16384.0;  
@@ -449,9 +450,6 @@ function handleChangedValue(event) {
             else{
             textAreaAPDS.value = stringvolume;
             if(arrString[2] !== "error" && arrString[2] !== "ok"){
-            R.textContent = arrString[2];
-            G.textContent = arrString[3];
-            B.textContent = arrString[4];
             C.textContent = arrString[5];
             progressProx.value = arrString[7];
             document.getElementById("proximityValue").innerText = arrString[7];
@@ -460,7 +458,25 @@ function handleChangedValue(event) {
             let gValue = parseInt(arrString[3]);
             let bValue = parseInt(arrString[4]);
 
-            colorSquare.style.backgroundColor = `rgb(${rValue}, ${gValue}, ${bValue})`;
+            if(rValue > RGBmax) RGBmax = rValue;
+            if(gValue > RGBmax) RGBmax = gValue;
+            if(bValue > RGBmax) RGBmax = bValue;
+
+            let rDisplay = mapValue(rValue, 0, RGBmax, 0, 255);
+            let gDisplay = mapValue(gValue, 0, RGBmax, 0, 255);
+            let bDisplay = mapValue(bValue, 0, RGBmax, 0, 255);
+
+            rDisplay = Math.round(rDisplay);
+            gDisplay = Math.round(gDisplay);
+            bDisplay = Math.round(bDisplay);
+
+            R.textContent = rDisplay;
+            G.textContent = gDisplay;
+            B.textContent = bDisplay;
+
+            console.log("|" + rDisplay + "|" + gDisplay + "|" + bDisplay + "|");
+
+            colorSquare.style.backgroundColor = `rgb(${rDisplay}, ${gDisplay}, ${bDisplay})`;
             }
             }
         }
@@ -472,6 +488,10 @@ function handleChangedValue(event) {
     else{
         string += valueString;     
     }
+}
+
+function mapValue(value, inMin, inMax, outMin, outMax) {
+    return (value - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
 }
 
 function handleAction(action) {
