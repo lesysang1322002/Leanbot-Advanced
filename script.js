@@ -149,6 +149,8 @@ function ResetVariables(){
     countRIGHT = 0;
     smoothVolume = 0;
     minVolume = 0;
+    RGBmax = 0;
+    Cmax = 0;
 }
 
 let string = "";
@@ -253,7 +255,7 @@ let maxGzError = 0;
 const progressProx = document.getElementById('progressProx');
 
 let countUP = 0, countDOWN = 0, countLEFT = 0, countRIGHT = 0;
-let RGBmax = 0;
+let RGBmax = 0, Cmax = 0;
 
 
 function handleChangedValue(event) {
@@ -450,6 +452,9 @@ function handleChangedValue(event) {
             else{
             textAreaAPDS.value = stringvolume;
             if(arrString[2] !== "error" && arrString[2] !== "ok"){
+            R.textContent = arrString[2];
+            G.textContent = arrString[3];
+            B.textContent = arrString[4];
             C.textContent = arrString[5];
             progressProx.value = arrString[7];
             document.getElementById("proximityValue").innerText = arrString[7];
@@ -461,20 +466,15 @@ function handleChangedValue(event) {
             if(rValue > RGBmax) RGBmax = rValue;
             if(gValue > RGBmax) RGBmax = gValue;
             if(bValue > RGBmax) RGBmax = bValue;
+            
+            let cValue = parseInt(arrString[5]);
+            if(cValue > Cmax) Cmax = cValue;
+            let cDisplay = mapValue(cValue, 0, Cmax, 0, 255);
+            C_Square.style.backgroundColor = `rgb(${cDisplay}, ${cDisplay}, ${cDisplay})`;
 
             let rDisplay = mapValue(rValue, 0, RGBmax, 0, 255);
             let gDisplay = mapValue(gValue, 0, RGBmax, 0, 255);
             let bDisplay = mapValue(bValue, 0, RGBmax, 0, 255);
-
-            rDisplay = Math.round(rDisplay);
-            gDisplay = Math.round(gDisplay);
-            bDisplay = Math.round(bDisplay);
-
-            R.textContent = rDisplay;
-            G.textContent = gDisplay;
-            B.textContent = bDisplay;
-
-            console.log("|" + rDisplay + "|" + gDisplay + "|" + bDisplay + "|");
 
             colorSquare.style.backgroundColor = `rgb(${rDisplay}, ${gDisplay}, ${bDisplay})`;
             }
