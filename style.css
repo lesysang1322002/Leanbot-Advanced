@@ -124,6 +124,34 @@ p{
   margin-bottom: 18px;
 }
 
+progress::-webkit-progress-bar {
+  background-color: blue; /* Màu nền xanh */
+  border-radius: 10px; /* Bo viền góc */
+  height: 10px; /* Chiều cao thanh tiến trình */
+}
+
+/* Thay đổi màu thanh tiến trình */
+progress::-webkit-progress-value {
+  background-color: white; /* Màu thanh tiến trình trắng */
+  border-radius: 10px; /* Bo viền góc cho thanh tiến trình */
+  height: 10px; /* Chiều cao thanh tiến trình */
+}
+
+/* Mỏng thanh tiến trình */
+progress {
+  width: 100%; /* Chiều rộng tùy ý */
+  height: 10px; /* Làm thanh mỏng lại */
+  border-radius: 10px; /* Bo viền toàn bộ thanh */
+  height: 10px; /* Chiều cao thanh tiến trình */
+}
+
+/* Cho Firefox */
+progress::-moz-progress-bar {
+  background-color: white; /* Màu thanh tiến trình trắng */
+  border-radius: 10px; /* Bo viền góc cho Firefox */
+  height: 10px; /* Chiều cao thanh tiến trình */
+}
+
 .gesture-container {
   display: flex;
   flex-direction: column;
