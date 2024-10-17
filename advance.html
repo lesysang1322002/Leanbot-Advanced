@@ -39,12 +39,12 @@
     <div class="container">
     <div class = "item" id = "RGB">
         <label class="sensor-name"><strong>APDS 9960</strong></label>
-        <textarea class="sensor-value monospace" id="textAreaAPDS" readonly></textarea>
+        <textarea class="sensor-value monospace" id="textAreaAPDS" readonly ></textarea>
         <div class = "column">
             <div class = "row">
                 <div class="form-group" style = "margin-bottom: 8px;">
                     <label for="message">C</label>
-                    <textarea id="C" name="message" class = "monospace"></textarea>
+                    <textarea id="C" name="message" class = "monospace"readonly ></textarea>
                 </div>
                 <div id="C_Square" style = "margin-bottom: 8px;"></div>
             </div>
@@ -52,15 +52,15 @@
                 <div class = "column">
                     <div class="form-group" style = "margin-bottom: 8px;">
                         <label for="message">R</label>
-                        <textarea id="R" name="message" class = "monospace"></textarea>
+                        <textarea id="R" name="message" class = "monospace"readonly ></textarea>
                     </div>
                     <div class="form-group" style = "margin-bottom: 8px;">
                         <label for="message">G</label>
-                        <textarea id="G" name="message" class = "monospace"></textarea>
+                        <textarea id="G" name="message" class = "monospace"readonly ></textarea>
                     </div>
                     <div class="form-group" style = "margin-bottom: 8px;">
                         <label for="message">B</label>
-                        <textarea id="B" name="message" class = "monospace"></textarea>
+                        <textarea id="B" name="message" class = "monospace"readonly ></textarea>
                     </div>
                 </div>
                 <div id="colorSquare" style = "margin-bottom: 8px;"></div>
@@ -71,7 +71,7 @@
             <progress id = "progressProx" max="255" value="0"></progress>
             <div class="form-group" style = "margin-bottom: 0px;">
                 <label for="message">Proximity</label>
-                <textarea id="proximityValue" name="message" class = "monospace"></textarea>
+                <textarea id="proximityValue" name="message" class = "monospace"readonly ></textarea>
             </div>
         </div>
 
@@ -91,21 +91,21 @@
     </div>
     <div class = "item">
         <label class = "sensor-name"><strong>MAX 4466</strong></label>
-        <textarea class = "sensor-value monospace" id="textAreaMAX" readonly></textarea>
+        <textarea class = "sensor-value monospace" id="textAreaMAX" readonly ></textarea>
         <div class = "row" style = "padding-top: 0px;">
             <div class="row-gap2">
                 <div class="column">
                     <div class="form-group" style = "margin-bottom: 8px;">
                         <label for="message">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;max</label>
-                        <textarea id = "textAreaMaxMean" name="message" class="monospace"></textarea>
+                        <textarea id = "textAreaMaxMean" name="message" class="monospace"readonly ></textarea>
                     </div>
                     <div class="form-group" style = "margin-bottom: 8px;">
                         <label for="message">DC Level</label>
-                        <textarea id = "textAreaMean" name="message" class="monospace"></textarea>
+                        <textarea id = "textAreaMean" name="message" class="monospace"readonly ></textarea>
                     </div>
                     <div class="form-group" style = "margin-bottom: 8px;">
                         <label for="message">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;min</label>
-                        <textarea id = "textAreaMinMean" name="message" class="monospace"></textarea>
+                        <textarea id = "textAreaMinMean" name="message" class="monospace"readonly ></textarea>
                     </div>
                 </div>
             </div>
@@ -113,15 +113,15 @@
                 <div class="column">
                     <div class="form-group" style = "margin-bottom: 8px;">
                         <label for="message">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;max</label>
-                        <textarea id="textAreaMaxVariance" name="message" class="monospace"></textarea>
+                        <textarea id="textAreaMaxVariance" name="message" class="monospace"readonly ></textarea>
                     </div>
                     <div class="form-group" style = "margin-bottom: 8px;">
                         <label for="message">AC Level</label>
-                        <textarea id="textAreaVariance" name="message" class="monospace"></textarea>
+                        <textarea id="textAreaVariance" name="message" class="monospace"readonly ></textarea>
                     </div>
                     <div class="form-group" style = "margin-bottom: 8px;">
                         <label for="message">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;min</label>
-                        <textarea id="textAreaMinVariance" name="message" class="monospace"></textarea>
+                        <textarea id="textAreaMinVariance" name="message" class="monospace"readonly ></textarea>
                     </div>
                 </div>
             </div>
@@ -131,13 +131,13 @@
     </div>
     <div class="item">
         <label class="sensor-name"><strong>MPU 6050</strong></label>
-        <textarea class="sensor-value monospace" id="textAreaMPU" readonly></textarea>
+        <textarea class="sensor-value monospace" id="textAreaMPU" readonly ></textarea>
         <div class="row-gap"> <!-- Thêm khoảng cách giữa các cột -->
             <div class="column">
                 <div class="row-gap2" style="padding-top:0px; margin-right: 0px;">
                     <div class="column form-group" style = "margin-bottom: 8px;">
                         <label for="message">&nbsp;&nbsp;&nbsp;&nbsp;</label>
-                        <textarea id="textAreaTemp" name="message" class="monospace"></textarea>
+                        <textarea id="textAreaTemp" name="message" class="monospace"readonly ></textarea>
                     </div>
                     <div class="column form-group" style = "margin-bottom: 8px;">
                         <label id="ICTemp" style="margin-left: 3px;">IC Temp</label>
@@ -147,29 +147,29 @@
                     <div class="column">
                         <div class="form-group" style = "margin-bottom: 8px;">
                             <label for="message">Ax</label>
-                            <textarea id="Ax" name="message" class="monospace"></textarea>
+                            <textarea id="Ax" name="message" class="monospace"readonly ></textarea>
                         </div>
                         <div class="form-group" style = "margin-bottom: 8px;">
                             <label for="message">Ay</label>
-                            <textarea id="Ay" name="message" class="monospace"></textarea>
+                            <textarea id="Ay" name="message" class="monospace"readonly ></textarea>
                         </div>
                         <div class="form-group">
                             <label for="message" style = "margin-bottom: 8px;">Az</label>
-                            <textarea id="Az" name="message" class="monospace"></textarea>
+                            <textarea id="Az" name="message" class="monospace"readonly ></textarea>
                         </div>
                     </div>
                     <div class="column" style="margin-left: 20px;">
                         <div class="form-group" style = "margin-bottom: 8px;">
                             <label for="message">Gx</label>
-                            <textarea id="Gx" name="message" class="monospace"></textarea>
+                            <textarea id="Gx" name="message" class="monospace"readonly ></textarea>
                         </div>
                         <div class="form-group" style = "margin-bottom: 8px;">
                             <label for="message">Gy</label>
-                            <textarea id="Gy" name="message" class="monospace"></textarea>
+                            <textarea id="Gy" name="message" class="monospace"readonly ></textarea>
                         </div>
                         <div class="form-group" style = "margin-bottom: 8px;">
                             <label for="message">Gz</label>
-                            <textarea id="Gz" name="message" class="monospace"></textarea>
+                            <textarea id="Gz" name="message" class="monospace"readonly ></textarea>
                         </div>
                     </div>
                 </div>
@@ -177,19 +177,19 @@
             <div class="column">
                 <div class="form-group" style = "margin-bottom: 8px;">
                     <label for="message">Qw</label>
-                    <textarea id="Qw" name="message" class="monospace"></textarea>
+                    <textarea id="Qw" name="message" class="monospace"readonly ></textarea>
                 </div>
                 <div class="form-group" style = "margin-bottom: 8px;">
                     <label for="message">Qx</label>
-                    <textarea id="Qx" name="message" class="monospace"></textarea>
+                    <textarea id="Qx" name="message" class="monospace"readonly ></textarea>
                 </div>
                 <div class="form-group" style = "margin-bottom: 8px;">
                     <label for="message">Qy</label>
-                    <textarea id="Qy" name="message" class="monospace"></textarea>
+                    <textarea id="Qy" name="message" class="monospace"readonly ></textarea>
                 </div>
                 <div class="form-group" style = "margin-bottom: 8px;">
                     <label for="message">Qz</label>
-                    <textarea id="Qz" name="message" class="monospace"></textarea>
+                    <textarea id="Qz" name="message" class="monospace"readonly ></textarea>
                 </div>
             </div>
         </div>           
