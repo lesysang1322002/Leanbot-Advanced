@@ -1,31 +1,29 @@
-var bleService = '0000ffe0-0000-1000-8000-00805f9b34fb';
-var bleCharacteristic = '0000ffe1-0000-1000-8000-00805f9b34fb';
-var gattCharacteristic;
-var bluetoothDeviceDetected;
+const bleService = '0000ffe0-0000-1000-8000-00805f9b34fb';
+const bleCharacteristic = '0000ffe1-0000-1000-8000-00805f9b34fb';
+let gattCharacteristic;
 
 function isWebBluetoothEnabled() {
-    if (!navigator.bluetooth) {
-    console.log('Web Bluetooth API is not available in this browser!');
-    // log('Web Bluetooth API is not available in this browser!');
-    return false
+    if (! navigator.bluetooth) {
+        console.log('Web Bluetooth API is not available in this browser!');
+        return false;
     }
-    return true
+    return true;
 }
+
 function requestBluetoothDevice() {
-    if(isWebBluetoothEnabled){
-logstatus('Finding...');
-navigator.bluetooth.requestDevice({
-    filters: [{
-        services: ['0000ffe0-0000-1000-8000-00805f9b34fb'] }] 
+    if (isWebBluetoothEnabled()){
+        logstatus('Finding...');
+        navigator.bluetooth.requestDevice({
+        filters: [{ services: ['0000ffe0-0000-1000-8000-00805f9b34fb'] }] 
     })         
-.then(device => {
-    device.addEventListener('gattserverdisconnected', onDisconnected);
-    dev=device;
-    logstatus("Connect to " + dev.name);
-    console.log('Connecting to', dev);
-    return device.gatt.connect();
-})
-.then(server => {
+    .then(device => {
+        device.addEventListener('gattserverdisconnected', onDisconnected);
+        dev=device;
+        logstatus("Connect to " + dev.name);
+        console.log('Connecting to', dev);
+        return device.gatt.connect();
+    })
+    .then(server => {
         console.log('Getting GATT Service...');
         logstatus('Getting Service...');
         return server.getPrimaryService(bleService);
@@ -36,27 +34,44 @@ navigator.bluetooth.requestDevice({
         return service.getCharacteristic(bleCharacteristic);
     })
     .then(characteristic => {
-        logstatus(dev.name + " - Advance Modules");
+        logstatus(dev.name + " - IoT Modules");
         checkMessageWithin5Seconds();
         document.getElementById("buttonText").innerText = "Rescan";
-        checkconnected = true;
-        gattCharacteristic = characteristic
+        enableButtons();
+        gattCharacteristic = characteristic;
         gattCharacteristic.addEventListener('characteristicvaluechanged', handleChangedValue);   
         return gattCharacteristic.startNotifications();
-})
-.catch(error => {
-    if (error instanceof DOMException && error.name === 'NotFoundError' && error.message === 'User cancelled the requestDevice() chooser.') {
-        console.log("User has canceled the device connection request.");
-        logstatus("SCAN to connect");
-    } else {
-        console.log("Unable to connect to device: " + error);
-        logstatus("ERROR");
-    }
+    })
+    .catch(error => {
+        if (error instanceof DOMException && error.name === 'NotFoundError' && error.message === 'User cancelled the requestDevice() chooser.') {
+            console.log("User has canceled the device connection request.");
+            logstatus("SCAN to connect");
+        } else {
+            console.log("Unable to connect to device: " + error);
+            logstatus("ERROR");
+        }
     });
 }}
 
-function disconnect()
-{
+function checkMessageWithin5Seconds() {
+    // Thiết lập hàm setTimeout để kết thúc sau 5 giây
+    timeoutCheckMessage = setTimeout(function() {
+    console.log("5 seconds timeout, message incorrect.");
+    // Hiển thị info box
+    UI('infopopup').style.display = "block";
+    document.addEventListener("click", function(event) {
+        if (! infoBox.contains(event.target)) {
+            infoBox.style.display = "none";
+        }
+    });
+    }, 5000);
+}
+
+function logstatus(text){
+    UI('navbarTitle').textContent = text;
+}
+
+function disconnect(){
     logstatus("SCAN to connect");
     console.log("Disconnected from: " + dev.name);
     return dev.gatt.disconnect();
@@ -65,49 +80,58 @@ function disconnect()
 function onDisconnected(event) {
     const device = event.target;
     logstatus("SCAN to connect");
-    ResetVariables();
-    document.getElementById("buttonText").innerText = "Scan";
+    resetVariable();
+    UI('buttonText').innerText = "Scan";
     console.log(`Device ${device.name} is disconnected.`);
 }
 
-function send(data){
-    console.log("You -> " + data + "\n");
-    gattCharacteristic.writeValue(str2ab(data+"\n"));
+async function send(data) {
+    if (! gattCharacteristic) {
+        console.log("GATT Characteristic not found.");
+        return;
+    }
+    console.log("You -> " + data);
+    let start = 0;
+    const dataLength = data.length;
+    while (start < dataLength) {
+        let subStr = data.substring(start, start + 16);
+        try {
+            await gattCharacteristic.writeValue(str2ab(subStr));
+        } catch (error) {
+            console.error("Error writing to characteristic:", error);
+            break;
+        }
+        start += 16;
+    }
+    try {
+        await gattCharacteristic.writeValue(str2ab('\n'));
+    } catch (error) {
+        console.error("Error writing newline to characteristic:", error);
+    }
 }
 
 function str2ab(str){
-    var buf = new ArrayBuffer(str.length);
-    var bufView = new Uint8Array(buf);
+    let buf = new ArrayBuffer(str.length);
+    let bufView = new Uint8Array(buf);
     for (var i = 0, l = str.length; i < l; i++) {
         bufView[i] = str.charCodeAt(i);
     }
     return buf;
 }
 
-function  logstatus(text){
-    const navbarTitle = document.getElementById('navbarTitle');
-    navbarTitle.textContent = text;
+function UI(elmentID) {
+    return document.getElementById(elmentID);
 }
 
 let checkconnected = false;
 
 const button = document.getElementById("toggleButton");
 
-function toggleFunction() {
-    if (button.innerText == "Scan") {
-        requestBluetoothDevice();
-    } else {
-        disconnect();
-        requestBluetoothDevice();
-        Rescan();
-    }
-}
-
 function Rescan(){
-    ResetVariables();
+    resetVariable();
 }
 
-function ResetVariables(){
+function resetVariable(){
     checkconnected = false;
     clearTimeout(timeoutId);
     checkFirstValue = true;
@@ -242,13 +266,6 @@ let minVolume;
 let smoothVolume = 0;
 let needCalibration = true;
 
-let gyroXerror = 19.5;
-let gyroYerror = 10.0;
-let gyroZerror = 1.8;
-
-let maxGxError = 0;
-let maxGyError = 0;
-let maxGzError = 0;
 const progressProx = document.getElementById('progressProx');
 
 const counts = {
@@ -472,21 +489,6 @@ function handleAction(action) {
     if (checkconnected) {
         send(action);
     }
-}
-
-function checkMessageWithin5Seconds() {
-    // Thiết lập hàm setTimeout để kết thúc sau 5 giây
-        timeoutCheckMessage = setTimeout(function() {
-        console.log("5 seconds timeout, message incorrect.");
-        let infoBox = document.getElementById("infopopup");
-        // Hiển thị info box
-        infoBox.style.display = "block";
-        document.addEventListener("click", function(event) {
-            if (!infoBox.contains(event.target)) {
-                infoBox.style.display = "none";
-            }
-        });
-    }, 5000);
 }
 
 document.addEventListener('DOMContentLoaded', function () {
