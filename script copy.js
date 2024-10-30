@@ -308,6 +308,8 @@ function handleSerialLine(line) {
     }
 }
 
+// *********MAX4466*********
+
 function MAX4466_handle(arrString) {
     const stringvolume = arrString.slice(1, arrString.length).join(" ");
     let arr2Int = parseInt(arrString[2]);
