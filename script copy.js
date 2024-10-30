@@ -1,5 +1,5 @@
-const bleService = '0000ffe0-0000-1000-8000-00805f9b34fb';
-const bleCharacteristic = '0000ffe1-0000-1000-8000-00805f9b34fb';
+var bleService = '0000ffe0-0000-1000-8000-00805f9b34fb';
+var bleCharacteristic = '0000ffe1-0000-1000-8000-00805f9b34fb';
 let gattCharacteristic;
 
 function isWebBluetoothEnabled() {
@@ -34,10 +34,9 @@ function requestBluetoothDevice() {
         return service.getCharacteristic(bleCharacteristic);
     })
     .then(characteristic => {
-        logstatus(dev.name + " - IoT Modules");
+        logstatus(dev.name + " - Advance Modules");
         checkMessageWithin5Seconds();
-        document.getElementById("buttonText").innerText = "Rescan";
-        enableButtons();
+        UI('buttonText').innerText = "Rescan";
         gattCharacteristic = characteristic;
         gattCharacteristic.addEventListener('characteristicvaluechanged', handleChangedValue);   
         return gattCharacteristic.startNotifications();
@@ -68,7 +67,7 @@ function checkMessageWithin5Seconds() {
 }
 
 function logstatus(text){
-    UI('navbarTitle').textContent = text;
+    UI('navbarTitle').value = text;
 }
 
 function disconnect(){
@@ -119,16 +118,18 @@ function str2ab(str){
     return buf;
 }
 
-function UI(elmentID) {
-    return document.getElementById(elmentID);
+function toggleFunction() {
+    if (UI('toggleButton').innerText == "Scan") {
+        requestBluetoothDevice();
+        return;
+    } 
+    disconnect();
+    requestBluetoothDevice();
+    resetVariable();
 }
 
-let checkconnected = false;
-
-const button = document.getElementById("toggleButton");
-
-function Rescan(){
-    resetVariable();
+function UI(elmentID) {
+    return document.getElementById(elmentID);
 }
 
 function resetVariable(){
@@ -138,31 +139,23 @@ function resetVariable(){
     checkmessageMPU6050 = false;
     checkmessageAPDS9960 = false;
     clearTimeout(timeoutCheckMessage);
-    textAreaAPDS.value = "";
-    textAreaMPU.value = "";
-    textAreaMAX.value = "";
-    TextAreaGesture.value = "";
-    TextAreaMean.value = "";
+    APDS9960_TextArea.value = "";
+    UI('MPU6050_TextArea').value = "";
+    UI('MAX4466_TextArea').value = "";
+    UI('MAX4466_TextArea_Mean').value = "";
 
     TextAreaProximity.value = "";
     TextAreaTemperature.value = "";
 
-    TextAreaMinMean.value = "";
-    TextAreaMaxMean.value = "";
-    R.textContent = "";
-    G.textContent = "";
-    B.textContent = "";
-    C.textContent = "";
-    Ax.textContent = "";
-    Ay.textContent = "";
-    Az.textContent = "";
-    Gx.textContent = "";
-    Gy.textContent = "";
-    Gz.textContent = "";
-    Qx.textContent = "";
-    Qy.textContent = "";
-    Qz.textContent = "";
-    Qw.textContent = "";
+    UI('MAX4466_TextArea_MinMean').value = "";
+    UI('MAX4466_TextArea_MaxMean').value = "";
+    APDS9960_TextArea_R.value = "";
+    APDS9960_TextArea_G.value = "";
+    APDS9960_TextArea_B.value = "";
+    APDS9960_TextArea.value = "";
+    MPU6050_TextArea_Ax.value = "";
+    MPU6050_TextArea.value = "";
+    MPU6050_TextArea.value = "";
     counts = {
         UP: 0,
         LEFT: 0,
@@ -175,47 +168,119 @@ function resetVariable(){
     Cmax = 0;
 }
 
-let textAreaAPDS = document.getElementById("textAreaAPDS");
-let textAreaMPU = document.getElementById("textAreaMPU");
-let textAreaMAX = document.getElementById("textAreaMAX");
-let TextAreaGesture = document.getElementById("textAreaGesture");
-let TextAreaMean = document.getElementById("textAreaMean");
-let TextAreaVariance = document.getElementById("textAreaVariance");
-let TextAreaMinVariance = document.getElementById("textAreaMinVariance");
-let TextAreaMaxVariance = document.getElementById("textAreaMaxVariance");
-let TextAreaMinMean = document.getElementById("textAreaMinMean");
-let TextAreaMaxMean = document.getElementById("textAreaMaxMean");
+let timeoutCheckMessage;
+let string = "";
+function handleChangedValue(event) {
+    const data = event.target.value;
+    const dataArray = new Uint8Array(data.buffer);
+    const textDecoder = new TextDecoder('utf-8');
+    const valueString = textDecoder.decode(dataArray);
 
-let TextAreaProximity = document.getElementById("proximityValue");
-let TextAreaTemperature = document.getElementById("textAreaTemp");
+    string += valueString;
+    const lines = string.split(/[\r\n]+/);
+    string = lines.pop() || "";
+    lines.forEach(line => {
+        if (line) { 
+            handleSerialLine(line);
+        }
+    });
+}
 
-let R = document.getElementById("R");
-let G = document.getElementById("G");
-let B = document.getElementById("B");
-let C = document.getElementById("C");
-let Ax = document.getElementById("Ax");
-let Ay = document.getElementById("Ay");
-let Az = document.getElementById("Az");
-let Gx = document.getElementById("Gx");
-let Gy = document.getElementById("Gy");
-let Gz = document.getElementById("Gz");
-let Qx = document.getElementById("Qx");
-let Qy = document.getElementById("Qy");
-let Qz = document.getElementById("Qz");
-let Qw = document.getElementById("Qw");
+function handleSerialLine(line) {
+    console.log("Nano > " + line);
+    const arrString = line.split(/[ \t]+/);
 
-let stringcheck = "";
+    if (checkmessageMPU6050 && checkmessageAPDS9960) clearTimeout(timeoutCheckMessage);
+    
+    switch (arrString[0]) {
+        case 'MAX4466' : return MAX4466_handle(arrString);
+        case 'MPU6050' : return MPU6050_handle(arrString);
+        case 'APDS9960': return APDS9960_handle(arrString);
+        default        : return;
+    }
+}
+
+//*******APDS9960*******/
+let checkmessageAPDS9960 = false;
+let RGBmax = 0, Cmax = 0;
 let timeoutId;
 
-let arrMean = [10];
-// let arrVariance = [10];
+const counts = {
+    UP: 0,
+    LEFT: 0,
+    RIGHT: 0,
+    DOWN: 0
+};
 
-let checkFirstValue = true;
-let minMean, maxMean, minVariance, maxVariance;
-let timeoutCheckMessage;
-let checkmessageMPU6050 = false;
-let checkmessageAPDS9960 = false;
-// Ensure gauge.js library is loaded
+function APDS9960_handle(arrString) {
+    checkmessageAPDS9960 = true;
+    const stringvolume = arrString.slice(1, arrString.length).join(" ");
+    if (arrString[1] === 'gesture' || arrString[8] === 'gesture') {
+        let gesture = "";
+        if(arrString[1] === 'gesture') gesture = arrString[2];
+        else gesture = arrString[9];
+
+        UI('btnUp').transition = 'none';
+        UI('btnLeft').transition = 'none';
+        UI('btnRight').transition = 'none';
+        UI('btnDown').transition = 'none';
+        
+        switch (gesture) {
+            case 'UP'   : return APDS9960_HandleGesture(btnUp, gesture); 
+            case 'LEFT' : return APDS9960_HandleGesture(btnLeft, gesture); 
+            case 'RIGHT': return APDS9960_HandleGesture(btnRight, gesture); 
+            case 'DOWN' : return APDS9960_HandleGesture(btnDown, gesture); 
+            default     : return;
+        }
+    } 
+    else{
+        UI('APDS9960_TextArea').value = stringvolume;
+        if(arrString[2] !== "error" && arrString[2] !== "ok"){
+            UI('APDS9960_TextArea_R').value = arrString[2];
+            UI('APDS9960_TextArea_G').value = arrString[3];
+            UI('APDS9960_TextArea_B').value = arrString[4];
+            UI('APDS9960_TextArea_C').value = arrString[5];
+            UI('APDS9960_progressProx').value = arrString[7];
+            UI('APDS9960_TextArea_proximity').value = arrString[7];
+
+            const rValue = parseInt(arrString[2]);
+            const gValue = parseInt(arrString[3]);
+            const bValue = parseInt(arrString[4]);
+            const cValue = parseInt(arrString[5]);
+
+            RGBmax = Math.max(RGBmax, rValue);
+            RGBmax = Math.max(RGBmax, gValue);
+            RGBmax = Math.max(RGBmax, bValue);
+            Cmax = Math.max(Cmax, cValue);
+
+            const cDisplay = mapValue(cValue, 0, Cmax, 0, 255);
+            const rDisplay = mapValue(rValue, 0, RGBmax, 0, 255);
+            const gDisplay = mapValue(gValue, 0, RGBmax, 0, 255);
+            const bDisplay = mapValue(bValue, 0, RGBmax, 0, 255);
+
+            APDS9960_Square_C.style.backgroundColor = `rgb(${cDisplay}, ${cDisplay}, ${cDisplay})`;
+            APDS9960_Square_RGB.style.backgroundColor = `rgb(${rDisplay}, ${gDisplay}, ${bDisplay})`;
+        }
+    }
+}
+
+function APDS9960_HandleGesture(button, label) {
+    button.style.backgroundColor = 'red';
+    counts[label]++; 
+
+    const paragraph = button.querySelector('h5');
+    if (paragraph) {
+        paragraph.innerHTML = label + "<br>" + counts[label];
+    }
+
+    setTimeout(() => {
+        button.style.transition = 'background-color 5s ease';
+        button.style.backgroundColor = 'transparent';
+    }, 1000);
+}
+
+//*******MAX4466*******/
+
 var opts = {
     colorStart: "#6fadcf",
     colorStop: void 0,
@@ -261,54 +326,11 @@ gauge.set(0);
 // Thiết lập tốc độ chuyển động
 gauge.animationSpeed = 32;
 
+let checkFirstValue = true;
+let minMean, maxMean, minVariance, maxVariance;
 let volume;
 let minVolume;
 let smoothVolume = 0;
-let needCalibration = true;
-
-const progressProx = document.getElementById('progressProx');
-
-const counts = {
-    UP: 0,
-    LEFT: 0,
-    RIGHT: 0,
-    DOWN: 0
-};
-
-let RGBmax = 0, Cmax = 0;
-
-let string = "";
-function handleChangedValue(event) {
-    const data = event.target.value;
-    const dataArray = new Uint8Array(data.buffer);
-    const textDecoder = new TextDecoder('utf-8');
-    const valueString = textDecoder.decode(dataArray);
-
-    string += valueString;
-    const lines = string.split(/[\r\n]+/);
-    string = lines.pop() || "";
-    lines.forEach(line => {
-        if (line) { 
-            handleSerialLine(line);
-        }
-    });
-}
-
-function handleSerialLine(line) {
-    console.log("Nano > " + line);
-    const arrString = line.split(/[ \t]+/);
-
-    if (checkmessageMPU6050 && checkmessageAPDS9960) clearTimeout(timeoutCheckMessage);
-    
-    switch (arrString[0]) {
-        case 'MAX4466' : return MAX4466_handle(arrString);
-        case 'MPU6050' : return MPU6050_handle(arrString);
-        case 'APDS9960': return APDS9960_handle(arrString);
-        default        : return;
-    }
-}
-
-// *********MAX4466*********
 
 function MAX4466_handle(arrString) {
     const stringvolume = arrString.slice(1, arrString.length).join(" ");
@@ -328,22 +350,22 @@ function MAX4466_handle(arrString) {
     minVariance = Math.min(minVariance, Variance);
     maxVariance = Math.max(maxVariance, Variance);
 
-    TextAreaMinMean.value = minMean;
-    TextAreaMaxMean.value = maxMean;
-    TextAreaMinVariance.value = minVariance;
-    TextAreaMaxVariance.value = maxVariance;
+    UI('MAX4466_TextArea_MinMean').value = minMean;
+    UI('MAX4466_TextArea_MaxMean').value = maxMean;
+    UI('MAX4466_TextArea_MinVariance').value = minVariance;
+    UI('MAX4466_TextArea_MaxVariance').value = maxVariance;
 
-    textAreaMAX.value = stringvolume;
-    TextAreaMean.value = arrString[2];
-    TextAreaVariance.value = arrString[4];
+    UI('MAX4466_TextArea').value = stringvolume;
+    UI('MAX4466_TextArea_Mean').value = arrString[2];
+    UI('MAX4466_TextArea_Variance').value = arrString[4];
 
     if(arrString[4] === '0') {
         if(!checkFirstValue) {
-            textAreaMAX.value = "Not plugged in";
+            UI('MAX4466_TextArea').value = "Not plugged in";
         }
-        TextAreaMean.value = "";
-        TextAreaMinMean.value = "";
-        TextAreaMaxMean.value = "";
+        UI('MAX4466_TextArea_Mean').value = "";
+        UI('MAX4466_TextArea_MinMean').value = "";
+        UI('MAX4466_TextArea_MaxMean').value = "";
         checkFirstValue = true;
         // Cập nhật màu cung tròn thành xám
         gauge.options.staticZones = [
@@ -365,116 +387,41 @@ function MAX4466_handle(arrString) {
     minVolume = Math.min(minVolume, smoothVolume);
   
     // Hiển thị giá trị đã làm tròn trên giao diện
-    document.getElementById("preview-textfield").textContent = smoothVolume.toFixed(1);
+    document.getElementById("preview-textfield").value = smoothVolume.toFixed(1);
     // Cập nhật gauge với giá trị không làm tròn để mượt mà hơn
     gauge.set(smoothVolume);            
 }
 
-function APDS9960_handle(arrString) {
-    checkmessageAPDS9960 = true;
-    const stringvolume = arrString.slice(1, arrString.length).join(" ");
-    if (arrString[1] === 'gesture' || arrString[8] === 'gesture') {
-        let gesture = "";
-        if(arrString[1] === 'gesture') gesture = arrString[2];
-        else gesture = arrString[9];
-
-        const btnUp = document.getElementById('btnUp');
-        const btnLeft = document.getElementById('btnLeft');
-        const btnRight = document.getElementById('btnRight');
-        const btnDown = document.getElementById('btnDown');
-
-        btnUp.style.transition = 'none'; 
-        btnLeft.style.transition = 'none';
-        btnRight.style.transition = 'none';
-        btnDown.style.transition = 'none';
-        
-        switch (gesture) {
-            case 'UP'   : return handleGesture(btnUp, gesture); 
-            case 'LEFT' : return handleGesture(btnLeft, gesture); 
-            case 'RIGHT': return handleGesture(btnRight, gesture); 
-            case 'DOWN' : return handleGesture(btnDown, gesture); 
-            default     : return;
-        }
-    } 
-    else{
-        textAreaAPDS.value = stringvolume;
-        console.log(arrString);
-        if(arrString[2] !== "error" && arrString[2] !== "ok"){
-            R.textContent = arrString[2];
-            G.textContent = arrString[3];
-            B.textContent = arrString[4];
-            C.textContent = arrString[5];
-            progressProx.value = arrString[7];
-            document.getElementById("proximityValue").innerText = arrString[7];
-
-            let rValue = parseInt(arrString[2]);
-            let gValue = parseInt(arrString[3]);
-            let bValue = parseInt(arrString[4]);
-            console.log("rValue: " + rValue + " gValue: " + gValue + " bValue: " + bValue);
-
-            RGBmax = Math.max(RGBmax, rValue);
-            RGBmax = Math.max(RGBmax, gValue);
-            RGBmax = Math.max(RGBmax, bValue);
-            
-            let cValue = parseInt(arrString[5]);
-            console.log("cValue: " + cValue);
-
-            Cmax = Math.max(Cmax, cValue);
-
-            let cDisplay = mapValue(cValue, 0, Cmax, 0, 255);
-            C_Square.style.backgroundColor = `rgb(${cDisplay}, ${cDisplay}, ${cDisplay})`;
-
-            let rDisplay = mapValue(rValue, 0, RGBmax, 0, 255);
-            let gDisplay = mapValue(gValue, 0, RGBmax, 0, 255);
-            let bDisplay = mapValue(bValue, 0, RGBmax, 0, 255);
-            colorSquare.style.backgroundColor = `rgb(${rDisplay}, ${gDisplay}, ${bDisplay})`;
-        }
-    }
-}
-
-function handleGesture(button, label) {
-    button.style.backgroundColor = 'red';
-    counts[label]++; 
-
-    let paragraph = button.querySelector('h5');
-    if (paragraph) {
-        paragraph.innerHTML = label + "<br>" + counts[label];
-    }
-
-    setTimeout(() => {
-        button.style.transition = 'background-color 5s ease';
-        button.style.backgroundColor = 'transparent';
-    }, 1000);
-}
+//*******MPU6050*******/
+let checkmessageMPU6050 = false;
 
 function MPU6050_handle(arrString) {
     const stringvolume = arrString.slice(1, arrString.length).join(" ");
     checkmessageMPU6050 = true;
-    textAreaMPU.value = stringvolume;
+    UI('MPU6050_TextArea').value = stringvolume;
     if(arrString[2] !== "error" && arrString[2] !== "ok") {
 
-        Ax.textContent = arrString[2];
-        Ay.textContent = arrString[3];
-        Az.textContent = arrString[4];
-        Gx.textContent = arrString[6];
-        Gy.textContent = arrString[7];
-        Gz.textContent = arrString[8];
+        UI('MPU6050_TextArea_Ax').value = arrString[2];
+        UI('MPU6050_TextArea_Ay').value = arrString[3];
+        UI('MPU6050_TextArea_Az').value = arrString[4];
+        UI('MPU6050_TextArea_Gx').value = arrString[6];
+        UI('MPU6050_TextArea_Gy').value = arrString[7];
+        UI('MPU6050_TextArea_Gz').value = arrString[8];
 
-        TextAreaTemperature.value = arrString[15] + "°C";
+        UI('MPU6050_TextArea_TemIC').value = arrString[15] + "°C";
 
         if(arrString[9] === 'Qwxyz' ) {
-            let w, x, y, z;
-            let scaleFactor = 16384.0;  
+            const scaleFactor = 16384.0;  
 
-            w = parseFloat(arrString[10]) / scaleFactor;
-            x = parseFloat(arrString[11]) / scaleFactor;
-            y = parseFloat(arrString[12]) / scaleFactor;
-            z = parseFloat(arrString[13]) / scaleFactor;     
+            const w = parseFloat(arrString[10]) / scaleFactor;
+            const x = parseFloat(arrString[11]) / scaleFactor;
+            const y = parseFloat(arrString[12]) / scaleFactor;
+            const z = parseFloat(arrString[13]) / scaleFactor;     
 
-            Qw.textContent = w.toFixed(2);
-            Qx.textContent = x.toFixed(2);
-            Qy.textContent = y.toFixed(2);
-            Qz.textContent = z.toFixed(2);        
+            UI('MPU6050_TextArea_Qw').value = w.toFixed(2);
+            UI('MPU6050_TextArea_Qx').value = x.toFixed(2);
+            UI('MPU6050_TextArea_Qy').value = y.toFixed(2);
+            UI('MPU6050_TextArea_Qz').value = z.toFixed(2);        
 
             var quaternion = new THREE.Quaternion(-x, z, y, w);
             cube.quaternion.copy(quaternion);
@@ -491,6 +438,21 @@ function handleAction(action) {
     if (checkconnected) {
         send(action);
     }
+}
+
+function checkMessageWithin5Seconds() {
+    // Thiết lập hàm setTimeout để kết thúc sau 5 giây
+        timeoutCheckMessage = setTimeout(function() {
+        console.log("5 seconds timeout, message incorrect.");
+        let infoBox = document.getElementById("infopopup");
+        // Hiển thị info box
+        infoBox.style.display = "block";
+        document.addEventListener("click", function(event) {
+            if (!infoBox.contains(event.target)) {
+                infoBox.style.display = "none";
+            }
+        });
+    }, 5000);
 }
 
 document.addEventListener('DOMContentLoaded', function () {
