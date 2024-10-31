@@ -146,6 +146,11 @@ function resetVariable() {
     minVolume = 0;
     RGBmax = 0;
     Cmax = 0;
+    UI('preview-textfield').textContent = 0;
+    UI('DCMotor_SliderValue').textContent = 0;
+    UI('DCMotor_Slider').value = 0;
+    UI('DCMotor_Button_Forward').style.backgroundColor = '#4d73de';
+    UI('DCMotor_Button_Backward').style.backgroundColor = '#4d73de';
 }
 
 let timeoutCheckMessage;
@@ -195,8 +200,7 @@ const counts = {
 
 function APDS9960_handle(arrString) {
     checkmessageAPDS9960 = true;
-    const stringTextArea = arrString.slice(1, arrString.length).join(" ");
-    UI('APDS9960_TextArea').value = stringTextArea;
+    UI('APDS9960_TextArea').value = arrString.slice(1, arrString.length).join(" ");
 
     if(arrString[2] === "error" || arrString[2] === "ok") return;
 
@@ -315,8 +319,7 @@ let minVolume;
 let smoothVolume = 0;
 
 function MAX4466_handle(arrString) {
-    const stringTextArea = arrString.slice(1, arrString.length).join(" ");
-    UI('MAX4466_TextArea').value = stringTextArea;
+    UI('MAX4466_TextArea').value = arrString.slice(1, arrString.length).join(" ");
 
     let arr2Int = parseInt(arrString[2]);
     let Variance = parseInt(arrString[4]);
@@ -378,8 +381,7 @@ let checkmessageMPU6050 = false;
 
 function MPU6050_handle(arrString) {
     checkmessageMPU6050 = true;
-    const stringTextArea = arrString.slice(1, arrString.length).join(" ");
-    UI('MPU6050_TextArea').value = stringTextArea;
+    UI('MPU6050_TextArea').value = arrString.slice(1, arrString.length).join(" ");
     if(arrString[2] === "error" || arrString[2] === "ok") return;
 
     UI('MPU6050_TextArea_Ax').value = arrString[2];
@@ -412,40 +414,39 @@ function MPU6050_handle(arrString) {
 //*******VL53L0X*******/
 
 function VL53L0X_handle(arrString) {
-    if (arrString[1] === '8190') {
+    if (arrString[1] === '8190') { // 8190 là giá trị mặc định khi không có vật thể
         UI('VL53L0x_TextArea').value = "No objects detected";
         UI('VL53L0x_ProgressDistance').value = 0;
         return;
     }
-    const stringTextArea = arrString.slice(1, arrString.length).join(" ");
-    UI('VL53L0x_TextArea').value = stringTextArea;
+    UI('VL53L0x_TextArea').value = arrString[1];
     UI('VL53L0x_ProgressDistance').value = arrString[1];
 }
 
 //*******DCMotor*******/
 
-function DCMotor_updateSliderValue(value) {
+function DCMotor_updateSliderValue(value) { // Khi điều chỉnh thanh trượt
     UI("DCMotor_SliderValue").textContent = value;
     if (DCMotor_Direction === "Forward") {
         handleAction("DCMotor " + value);
-        UI('DCMotor_Button_Forward').style.backgroundColor = 'red';
+        UI('DCMotor_Button_Forward').style.backgroundColor = 'red'; // Đổi màu nút Forward
         UI('DCMotor_Button_Backward').style.backgroundColor = '#4d73de';
         return;
     }
     handleAction("DCMotor -" + value);
-    UI('DCMotor_Button_Backward').style.backgroundColor = 'red';
+    UI('DCMotor_Button_Backward').style.backgroundColor = 'red'; // Đổi màu nút Backward
     UI('DCMotor_Button_Forward').style.backgroundColor = '#4d73de';
 }
 
 let DCMotor_Direction = "Forward";
 
-function DCMotor_Button_Forward() {
+function DCMotor_Button_Forward() { // Khi nhấn nút Forward
     DCMotor_Direction = "Forward";
     DCMotor_updateSliderValue(UI("DCMotor_Slider").value);
    
 }
 
-function DCMotor_Button_Backward() {
+function DCMotor_Button_Backward() { // Khi nhấn nút Backward
     DCMotor_Direction = "Backward";
     DCMotor_updateSliderValue(UI("DCMotor_Slider").value);
 }
