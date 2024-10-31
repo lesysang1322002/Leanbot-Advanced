@@ -67,7 +67,7 @@ function checkMessageWithin5Seconds() {
 }
 
 function logstatus(text){
-    UI('navbarTitle').value = text;
+    UI('navbarTitle').textContent = text;
 }
 
 function disconnect(){
@@ -132,36 +132,16 @@ function UI(elmentID) {
     return document.getElementById(elmentID);
 }
 
-function resetVariable(){
-    checkconnected = false;
+function resetVariable() {
     clearTimeout(timeoutId);
+    clearTimeout(timeoutCheckMessage);
     checkFirstValue = true;
     checkmessageMPU6050 = false;
     checkmessageAPDS9960 = false;
-    clearTimeout(timeoutCheckMessage);
-    APDS9960_TextArea.value = "";
-    UI('MPU6050_TextArea').value = "";
-    UI('MAX4466_TextArea').value = "";
-    UI('MAX4466_TextArea_Mean').value = "";
 
-    TextAreaProximity.value = "";
-    TextAreaTemperature.value = "";
-
-    UI('MAX4466_TextArea_MinMean').value = "";
-    UI('MAX4466_TextArea_MaxMean').value = "";
-    APDS9960_TextArea_R.value = "";
-    APDS9960_TextArea_G.value = "";
-    APDS9960_TextArea_B.value = "";
-    APDS9960_TextArea.value = "";
-    MPU6050_TextArea_Ax.value = "";
-    MPU6050_TextArea.value = "";
-    MPU6050_TextArea.value = "";
-    counts = {
-        UP: 0,
-        LEFT: 0,
-        RIGHT: 0,
-        DOWN: 0
-    };    
+    document.querySelectorAll("textarea").forEach(el => el.value = ""); // Xóa nội dung của tất cả textarea
+    
+    counts = { UP: 0, LEFT: 0, RIGHT: 0, DOWN: 0 };
     smoothVolume = 0;
     minVolume = 0;
     RGBmax = 0;
@@ -196,6 +176,7 @@ function handleSerialLine(line) {
         case 'MAX4466' : return MAX4466_handle(arrString);
         case 'MPU6050' : return MPU6050_handle(arrString);
         case 'APDS9960': return APDS9960_handle(arrString);
+        case 'VL53L0x' : return VL53L0X_handle(arrString);
         default        : return;
     }
 }
@@ -214,14 +195,18 @@ const counts = {
 
 function APDS9960_handle(arrString) {
     checkmessageAPDS9960 = true;
-    const stringvolume = arrString.slice(1, arrString.length).join(" ");
+    const stringTextArea = arrString.slice(1, arrString.length).join(" ");
+    UI('APDS9960_TextArea').value = stringTextArea;
+
+    if(arrString[2] === "error" || arrString[2] === "ok") return;
+
     if (arrString[1] === 'gesture' || arrString[8] === 'gesture') {
         let gesture = "";
         if(arrString[1] === 'gesture') gesture = arrString[2];
         else gesture = arrString[9];
 
         UI('btnUp').transition = 'none';
-        UI('btnLeft').transition = 'none';
+        UI('btnLeft').transition = 'none'; 
         UI('btnRight').transition = 'none';
         UI('btnDown').transition = 'none';
         
@@ -232,36 +217,33 @@ function APDS9960_handle(arrString) {
             case 'DOWN' : return APDS9960_HandleGesture(btnDown, gesture); 
             default     : return;
         }
+        return;
     } 
-    else{
-        UI('APDS9960_TextArea').value = stringvolume;
-        if(arrString[2] !== "error" && arrString[2] !== "ok"){
-            UI('APDS9960_TextArea_R').value = arrString[2];
-            UI('APDS9960_TextArea_G').value = arrString[3];
-            UI('APDS9960_TextArea_B').value = arrString[4];
-            UI('APDS9960_TextArea_C').value = arrString[5];
-            UI('APDS9960_progressProx').value = arrString[7];
-            UI('APDS9960_TextArea_proximity').value = arrString[7];
 
-            const rValue = parseInt(arrString[2]);
-            const gValue = parseInt(arrString[3]);
-            const bValue = parseInt(arrString[4]);
-            const cValue = parseInt(arrString[5]);
+    UI('APDS9960_TextArea_R').value = arrString[2];
+    UI('APDS9960_TextArea_G').value = arrString[3];
+    UI('APDS9960_TextArea_B').value = arrString[4];
+    UI('APDS9960_TextArea_C').value = arrString[5];
+    UI('APDS9960_progressProx').value = arrString[7];
+    UI('APDS9960_TextArea_proximity').value = arrString[7];
 
-            RGBmax = Math.max(RGBmax, rValue);
-            RGBmax = Math.max(RGBmax, gValue);
-            RGBmax = Math.max(RGBmax, bValue);
-            Cmax = Math.max(Cmax, cValue);
+    const rValue = parseInt(arrString[2]);
+    const gValue = parseInt(arrString[3]);
+    const bValue = parseInt(arrString[4]);
+    const cValue = parseInt(arrString[5]);
 
-            const cDisplay = mapValue(cValue, 0, Cmax, 0, 255);
-            const rDisplay = mapValue(rValue, 0, RGBmax, 0, 255);
-            const gDisplay = mapValue(gValue, 0, RGBmax, 0, 255);
-            const bDisplay = mapValue(bValue, 0, RGBmax, 0, 255);
+    RGBmax = Math.max(RGBmax, rValue);
+    RGBmax = Math.max(RGBmax, gValue);
+    RGBmax = Math.max(RGBmax, bValue);
+    Cmax = Math.max(Cmax, cValue);
 
-            APDS9960_Square_C.style.backgroundColor = `rgb(${cDisplay}, ${cDisplay}, ${cDisplay})`;
-            APDS9960_Square_RGB.style.backgroundColor = `rgb(${rDisplay}, ${gDisplay}, ${bDisplay})`;
-        }
-    }
+    const cDisplay = mapValue(cValue, 0, Cmax, 0, 255);
+    const rDisplay = mapValue(rValue, 0, RGBmax, 0, 255);
+    const gDisplay = mapValue(gValue, 0, RGBmax, 0, 255);
+    const bDisplay = mapValue(bValue, 0, RGBmax, 0, 255);
+
+    APDS9960_Square_C.style.backgroundColor = `rgb(${cDisplay}, ${cDisplay}, ${cDisplay})`;
+    APDS9960_Square_RGB.style.backgroundColor = `rgb(${rDisplay}, ${gDisplay}, ${bDisplay})`;
 }
 
 function APDS9960_HandleGesture(button, label) {
@@ -333,9 +315,12 @@ let minVolume;
 let smoothVolume = 0;
 
 function MAX4466_handle(arrString) {
-    const stringvolume = arrString.slice(1, arrString.length).join(" ");
+    const stringTextArea = arrString.slice(1, arrString.length).join(" ");
+    UI('MAX4466_TextArea').value = stringTextArea;
+
     let arr2Int = parseInt(arrString[2]);
     let Variance = parseInt(arrString[4]);
+
     if(checkFirstValue){
         minMean = arr2Int;
         maxMean = arr2Int;
@@ -354,15 +339,11 @@ function MAX4466_handle(arrString) {
     UI('MAX4466_TextArea_MaxMean').value = maxMean;
     UI('MAX4466_TextArea_MinVariance').value = minVariance;
     UI('MAX4466_TextArea_MaxVariance').value = maxVariance;
-
-    UI('MAX4466_TextArea').value = stringvolume;
     UI('MAX4466_TextArea_Mean').value = arrString[2];
     UI('MAX4466_TextArea_Variance').value = arrString[4];
 
     if(arrString[4] === '0') {
-        if(!checkFirstValue) {
-            UI('MAX4466_TextArea').value = "Not plugged in";
-        }
+        if(!checkFirstValue) UI('MAX4466_TextArea').value = "Not plugged in";
         UI('MAX4466_TextArea_Mean').value = "";
         UI('MAX4466_TextArea_MinMean').value = "";
         UI('MAX4466_TextArea_MaxMean').value = "";
@@ -387,7 +368,7 @@ function MAX4466_handle(arrString) {
     minVolume = Math.min(minVolume, smoothVolume);
   
     // Hiển thị giá trị đã làm tròn trên giao diện
-    document.getElementById("preview-textfield").value = smoothVolume.toFixed(1);
+    document.getElementById("preview-textfield").textContent = smoothVolume.toFixed(1);
     // Cập nhật gauge với giá trị không làm tròn để mượt mà hơn
     gauge.set(smoothVolume);            
 }
@@ -396,63 +377,89 @@ function MAX4466_handle(arrString) {
 let checkmessageMPU6050 = false;
 
 function MPU6050_handle(arrString) {
-    const stringvolume = arrString.slice(1, arrString.length).join(" ");
     checkmessageMPU6050 = true;
-    UI('MPU6050_TextArea').value = stringvolume;
-    if(arrString[2] !== "error" && arrString[2] !== "ok") {
+    const stringTextArea = arrString.slice(1, arrString.length).join(" ");
+    UI('MPU6050_TextArea').value = stringTextArea;
+    if(arrString[2] === "error" || arrString[2] === "ok") return;
 
-        UI('MPU6050_TextArea_Ax').value = arrString[2];
-        UI('MPU6050_TextArea_Ay').value = arrString[3];
-        UI('MPU6050_TextArea_Az').value = arrString[4];
-        UI('MPU6050_TextArea_Gx').value = arrString[6];
-        UI('MPU6050_TextArea_Gy').value = arrString[7];
-        UI('MPU6050_TextArea_Gz').value = arrString[8];
+    UI('MPU6050_TextArea_Ax').value = arrString[2];
+    UI('MPU6050_TextArea_Ay').value = arrString[3];
+    UI('MPU6050_TextArea_Az').value = arrString[4];
+    UI('MPU6050_TextArea_Gx').value = arrString[6];
+    UI('MPU6050_TextArea_Gy').value = arrString[7];
+    UI('MPU6050_TextArea_Gz').value = arrString[8];
 
-        UI('MPU6050_TextArea_TemIC').value = arrString[15] + "°C";
+    UI('MPU6050_TextArea_TemIC').value = arrString[15] + "°C";
 
-        if(arrString[9] === 'Qwxyz' ) {
-            const scaleFactor = 16384.0;  
+    if(arrString[9] !== 'Qwxyz' ) return;
+    const scaleFactor = 16384.0;  
 
-            const w = parseFloat(arrString[10]) / scaleFactor;
-            const x = parseFloat(arrString[11]) / scaleFactor;
-            const y = parseFloat(arrString[12]) / scaleFactor;
-            const z = parseFloat(arrString[13]) / scaleFactor;     
+    const w = parseFloat(arrString[10]) / scaleFactor;
+    const x = parseFloat(arrString[11]) / scaleFactor;
+    const y = parseFloat(arrString[12]) / scaleFactor;
+    const z = parseFloat(arrString[13]) / scaleFactor;     
 
-            UI('MPU6050_TextArea_Qw').value = w.toFixed(2);
-            UI('MPU6050_TextArea_Qx').value = x.toFixed(2);
-            UI('MPU6050_TextArea_Qy').value = y.toFixed(2);
-            UI('MPU6050_TextArea_Qz').value = z.toFixed(2);        
+    UI('MPU6050_TextArea_Qw').value = w.toFixed(2);
+    UI('MPU6050_TextArea_Qx').value = x.toFixed(2);
+    UI('MPU6050_TextArea_Qy').value = y.toFixed(2);
+    UI('MPU6050_TextArea_Qz').value = z.toFixed(2);        
 
-            var quaternion = new THREE.Quaternion(-x, z, y, w);
-            cube.quaternion.copy(quaternion);
-            renderer.render(scene, camera);
-        }
-    }
+    var quaternion = new THREE.Quaternion(-x, z, y, w);
+    cube.quaternion.copy(quaternion);
+    renderer.render(scene, camera);
 }
+
+//*******VL53L0X*******/
+
+function VL53L0X_handle(arrString) {
+    if (arrString[1] === '8190') {
+        UI('VL53L0x_TextArea').value = "No objects detected";
+        UI('VL53L0x_ProgressDistance').value = 0;
+        return;
+    }
+    const stringTextArea = arrString.slice(1, arrString.length).join(" ");
+    UI('VL53L0x_TextArea').value = stringTextArea;
+    UI('VL53L0x_ProgressDistance').value = arrString[1];
+}
+
+//*******DCMotor*******/
+
+function DCMotor_updateSliderValue(value) {
+    UI("DCMotor_SliderValue").textContent = value;
+    if (DCMotor_Direction === "Forward") {
+        handleAction("DCMotor " + value);
+        UI('DCMotor_Button_Forward').style.backgroundColor = 'red';
+        UI('DCMotor_Button_Backward').style.backgroundColor = '#4d73de';
+        return;
+    }
+    handleAction("DCMotor -" + value);
+    UI('DCMotor_Button_Backward').style.backgroundColor = 'red';
+    UI('DCMotor_Button_Forward').style.backgroundColor = '#4d73de';
+}
+
+let DCMotor_Direction = "Forward";
+
+function DCMotor_Button_Forward() {
+    DCMotor_Direction = "Forward";
+    DCMotor_updateSliderValue(UI("DCMotor_Slider").value);
+   
+}
+
+function DCMotor_Button_Backward() {
+    DCMotor_Direction = "Backward";
+    DCMotor_updateSliderValue(UI("DCMotor_Slider").value);
+}
+
+//**************/
 
 function mapValue(value, inMin, inMax, outMin, outMax) {
     return (value - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
 }
 
 function handleAction(action) {
-    if (checkconnected) {
+    if (gattCharacteristic) {
         send(action);
     }
-}
-
-function checkMessageWithin5Seconds() {
-    // Thiết lập hàm setTimeout để kết thúc sau 5 giây
-        timeoutCheckMessage = setTimeout(function() {
-        console.log("5 seconds timeout, message incorrect.");
-        let infoBox = document.getElementById("infopopup");
-        // Hiển thị info box
-        infoBox.style.display = "block";
-        document.addEventListener("click", function(event) {
-            if (!infoBox.contains(event.target)) {
-                infoBox.style.display = "none";
-            }
-        });
-    }, 5000);
 }
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -502,10 +509,6 @@ tabs.forEach(function(tab) {
         this.classList.add('active');
     });
 });
-
-function toRadians(degrees) {
-    return degrees * (Math.PI / 180);
-}
 
 let scene, camera, renderer, cube;
 
