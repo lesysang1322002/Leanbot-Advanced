@@ -432,7 +432,7 @@ function VL53L0X_handle(arrString) {
         UI('VL53L0x_ProgressDistance').value = arrString[1];
         return;
     }
-
+    // Nếu khoảng cách lớn hơn 2m
     UI('VL53L0x_TextArea').value = "No objects detected";
     UI('VL53L0x_ProgressDistance').value = 0;
 }
@@ -440,6 +440,7 @@ function VL53L0X_handle(arrString) {
 //*******DCMotor*******/
 
 function DCMotor_updateSliderValue(value) { // Khi điều chỉnh thanh trượt
+    if (!gattCharacteristic) return;       // Nếu chưa kết nối BLE thì thoát
     UI("DCMotor_TextArea_PowerLevel").textContent = value;
     UI("DCMotor_Slider").value = value;
     if ( UI("DCMotor_Direction").textContent === "Forward") handleAction("DCMotor " + value);
@@ -447,12 +448,12 @@ function DCMotor_updateSliderValue(value) { // Khi điều chỉnh thanh trượ
 }
 
 function DCMotor_toggleDirection() { // Toggle trạng thái Forward và Backward
+    if (!gattCharacteristic) return; // Nếu chưa kết nối BLE thì thoát
     UI("DCMotor_Direction").textContent = UI("DCMotor_Direction").textContent === "Forward" ? "Backward" : "Forward";
     DCMotor_updateSliderValue(UI("DCMotor_Slider").value);
 }
 
-
-//**************/
+/**************/
 
 function mapValue(value, inMin, inMax, outMin, outMax) {
     return (value - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
