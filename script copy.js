@@ -128,8 +128,8 @@ function toggleFunction() {
     resetVariable();
 }
 
-function UI(elmentID) {
-    return document.getElementById(elmentID);
+function UI(elementID) {
+    return document.getElementById(elementID);
 }
 
 function resetVariable() {
@@ -426,33 +426,40 @@ function MPU6050_handle(arrString) {
 
 function VL53L0X_handle(arrString) {
     UI('VL53L0x_TextArea').value = arrString.slice(1, arrString.length).join(" ");
+    if(arrString[1] === 'not') {
+        UI('VL53L0x_TextArea').value = arrString.join(" ");
+        // Xóa nội dung trước đó (trường hợp cắm module rồi thao ra)
+        UI('VL53L0x_ProgressDistance').value = 0;
+        UI('VL53L0x_TextArea_Distance').value = "";
+        return;
+    }
     if(arrString[2] === "error" || arrString[2] === "ok") return;
 
     if ( parseInt(arrString[1]) <= 2000) { // Nếu khoảng cách nhỏ hơn 2m
-        UI('VL53L0x_ProgressDistance').value = arrString[1];
+        UI('VL53L0x_ProgressDistance').value = arrString[1]; // Thanh progress đang để max = 2000
+        UI('VL53L0x_TextArea_Distance').value = arrString[1] + " mm"; // Hiển thị khoảng cách
         return;
     }
     // Nếu khoảng cách lớn hơn 2m
     UI('VL53L0x_TextArea').value = "No objects detected";
     UI('VL53L0x_ProgressDistance').value = 0;
+    UI('VL53L0x_TextArea_Distance').value = "";
 }
 
 //*******DCMotor*******/
 
 function DCMotor_updateSliderValue(value) { // Khi điều chỉnh thanh trượt
     if (!gattCharacteristic) return;       // Nếu chưa kết nối BLE thì thoát
-    UI("DCMotor_TextArea_PowerLevel").textContent = value;
     UI("DCMotor_Slider").value = value;
-    if ( UI("DCMotor_Direction").textContent === "Forward") handleAction("DCMotor " + value);
-    else handleAction("DCMotor -" + value);
+    
+    const adjustedValue = UI("DCMotor_Switch").checked ? "+" + value : "-" + value;
+    handleAction("DCMotor " + adjustedValue);
+    UI("DCMotor_TextArea_PowerLevel").textContent = adjustedValue;
 }
 
-function DCMotor_toggleDirection() { // Toggle trạng thái Forward và Backward
-    if (!gattCharacteristic) return; // Nếu chưa kết nối BLE thì thoát
-    UI("DCMotor_Direction").textContent = UI("DCMotor_Direction").textContent === "Forward" ? "Backward" : "Forward";
+function DCMotor_handleSwitchChange() { // Khi click vào switch
     DCMotor_updateSliderValue(UI("DCMotor_Slider").value);
 }
-
 /**************/
 
 function mapValue(value, inMin, inMax, outMin, outMax) {
