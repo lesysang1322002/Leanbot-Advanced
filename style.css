@@ -29,6 +29,7 @@ body {
   width: 22px; /* Đặt kích thước chiều rộng mong muốn */
   height: auto;
 }
+
 #buttonText{
   font-weight: bold;
 }
