@@ -107,7 +107,7 @@ p{
   text-align: center;
 }
 
-#APDS9960_TextArea_R, #APDS9960_TextArea_G, #APDS9960_TextArea_B, #APDS9960_TextArea_C, #textAreaQwxyz, #APDS9960_TextArea_proximity, #MPU6050_TextArea_Qw, #MPU6050_TextArea_Qx, #MPU6050_TextArea_Qy, #MPU6050_TextArea_Qz, #MPU6050_TextArea_Ax, #MPU6050_TextArea_Ay, #MPU6050_TextArea_Az, #MPU6050_TextArea_Gx, #MPU6050_TextArea_Gy,#MPU6050_TextArea_Gz, #MAX4466_TextArea_Mean, #MAX4466_TextArea_MaxMean, #MAX4466_TextArea_MinMean, #MAX4466_TextArea_Variance, #MAX4466_TextArea_MaxVariance,  #MAX4466_TextArea_MinVariance{
+#APDS9960_TextArea_R, #APDS9960_TextArea_G, #APDS9960_TextArea_B, #APDS9960_TextArea_C, #textAreaQwxyz, #APDS9960_TextArea_proximity,#DCMotor_TextArea_PowerLevel, #MPU6050_TextArea_Qw, #MPU6050_TextArea_Qx, #MPU6050_TextArea_Qy, #MPU6050_TextArea_Qz, #MPU6050_TextArea_Ax, #MPU6050_TextArea_Ay, #MPU6050_TextArea_Az, #MPU6050_TextArea_Gx, #MPU6050_TextArea_Gy,#MPU6050_TextArea_Gz, #MAX4466_TextArea_Mean, #MAX4466_TextArea_MaxMean, #MAX4466_TextArea_MinMean, #MAX4466_TextArea_Variance, #MAX4466_TextArea_MaxVariance,  #MAX4466_TextArea_MinVariance{
   height: 30px;
   resize: none;
   text-align: right;
@@ -260,6 +260,22 @@ progress::-moz-progress-bar {
   margin-top: 10px;
 }
 
+#DCMotor_Slider{
+  width: 200px !important; /* Đảm bảo chiều rộng của slider được ưu tiên */
+}
+
+.DCMotor_Button_Slider {
+  width: 45px;
+  height: 25px;
+  font-size: 12px;
+  border-radius: 5px;
+  border: 2px solid #ccc;
+  background-color: #4d73de;
+  cursor: pointer;
+  font-weight: bold;
+  margin: 0px 10px;
+}
+
 @media screen and (max-width: 1100px) {
   .form-group textarea{
     width: 35px;
@@ -305,6 +321,8 @@ progress::-moz-progress-bar {
 .DCMotor_Slider {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .DCMotor_Button {

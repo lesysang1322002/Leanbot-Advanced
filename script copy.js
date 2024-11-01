@@ -133,7 +133,6 @@ function UI(elmentID) {
 }
 
 function resetVariable() {
-    clearTimeout(timeoutId);
     clearTimeout(timeoutCheckMessage);
     checkFirstValue = true;
     checkmessageMPU6050 = false;
@@ -143,14 +142,27 @@ function resetVariable() {
     
     counts = { UP: 0, LEFT: 0, RIGHT: 0, DOWN: 0 };
     smoothVolume = 0;
-    minVolume = 0;
     RGBmax = 0;
     Cmax = 0;
+
     UI('preview-textfield').textContent = 0;
-    UI('DCMotor_SliderValue').textContent = 0;
+    gauge.set(0);
+    UI('DCMotor_TextArea_PowerLevel').textContent = 0;
     UI('DCMotor_Slider').value = 0;
-    UI('DCMotor_Button_Forward').style.backgroundColor = '#4d73de';
-    UI('DCMotor_Button_Backward').style.backgroundColor = '#4d73de';
+    UI('DCMotor_Direction').textContent = "Forward";
+
+    UI('btnUp').style.backgroundColor = 'transparent';
+    UI('btnLeft').style.backgroundColor = 'transparent';
+    UI('btnRight').style.backgroundColor = 'transparent';
+    UI('btnDown').style.backgroundColor = 'transparent';
+
+    UI('btnUp').querySelector('h5').innerHTML = "UP<br>0";
+    UI('btnLeft').querySelector('h5').innerHTML = "LEFT<br>0";
+    UI('btnRight').querySelector('h5').innerHTML = "RIGHT<br>0";
+    UI('btnDown').querySelector('h5').innerHTML = "DOWN<br>0";
+
+    UI('APDS9960_Square_C').style.backgroundColor = 'white';
+    UI('APDS9960_Square_RGB').style.backgroundColor = 'white';
 }
 
 let timeoutCheckMessage;
@@ -189,9 +201,8 @@ function handleSerialLine(line) {
 //*******APDS9960*******/
 let checkmessageAPDS9960 = false;
 let RGBmax = 0, Cmax = 0;
-let timeoutId;
 
-const counts = {
+let counts = {
     UP: 0,
     LEFT: 0,
     RIGHT: 0,
@@ -371,7 +382,7 @@ function MAX4466_handle(arrString) {
     minVolume = Math.min(minVolume, smoothVolume);
   
     // Hiển thị giá trị đã làm tròn trên giao diện
-    document.getElementById("preview-textfield").textContent = smoothVolume.toFixed(1);
+    UI("preview-textfield").textContent = smoothVolume.toFixed(1);
     // Cập nhật gauge với giá trị không làm tròn để mượt mà hơn
     gauge.set(smoothVolume);            
 }
@@ -414,42 +425,32 @@ function MPU6050_handle(arrString) {
 //*******VL53L0X*******/
 
 function VL53L0X_handle(arrString) {
-    if (arrString[1] === '8190') { // 8190 là giá trị mặc định khi không có vật thể
-        UI('VL53L0x_TextArea').value = "No objects detected";
-        UI('VL53L0x_ProgressDistance').value = 0;
+    UI('VL53L0x_TextArea').value = arrString.slice(1, arrString.length).join(" ");
+    if(arrString[2] === "error" || arrString[2] === "ok") return;
+
+    if ( parseInt(arrString[1]) <= 2000) { // Nếu khoảng cách nhỏ hơn 2m
+        UI('VL53L0x_ProgressDistance').value = arrString[1];
         return;
     }
-    UI('VL53L0x_TextArea').value = arrString[1];
-    UI('VL53L0x_ProgressDistance').value = arrString[1];
+
+    UI('VL53L0x_TextArea').value = "No objects detected";
+    UI('VL53L0x_ProgressDistance').value = 0;
 }
 
 //*******DCMotor*******/
 
 function DCMotor_updateSliderValue(value) { // Khi điều chỉnh thanh trượt
-    UI("DCMotor_SliderValue").textContent = value;
-    if (DCMotor_Direction === "Forward") {
-        handleAction("DCMotor " + value);
-        UI('DCMotor_Button_Forward').style.backgroundColor = 'red'; // Đổi màu nút Forward
-        UI('DCMotor_Button_Backward').style.backgroundColor = '#4d73de';
-        return;
-    }
-    handleAction("DCMotor -" + value);
-    UI('DCMotor_Button_Backward').style.backgroundColor = 'red'; // Đổi màu nút Backward
-    UI('DCMotor_Button_Forward').style.backgroundColor = '#4d73de';
+    UI("DCMotor_TextArea_PowerLevel").textContent = value;
+    UI("DCMotor_Slider").value = value;
+    if ( UI("DCMotor_Direction").textContent === "Forward") handleAction("DCMotor " + value);
+    else handleAction("DCMotor -" + value);
 }
 
-let DCMotor_Direction = "Forward";
-
-function DCMotor_Button_Forward() { // Khi nhấn nút Forward
-    DCMotor_Direction = "Forward";
-    DCMotor_updateSliderValue(UI("DCMotor_Slider").value);
-   
-}
-
-function DCMotor_Button_Backward() { // Khi nhấn nút Backward
-    DCMotor_Direction = "Backward";
+function DCMotor_toggleDirection() { // Toggle trạng thái Forward và Backward
+    UI("DCMotor_Direction").textContent = UI("DCMotor_Direction").textContent === "Forward" ? "Backward" : "Forward";
     DCMotor_updateSliderValue(UI("DCMotor_Slider").value);
 }
+
 
 //**************/
 
