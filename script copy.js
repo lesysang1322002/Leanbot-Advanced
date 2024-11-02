@@ -128,9 +128,9 @@ function toggleFunction() {
     resetVariable();
 }
 
-function UI(elementID) {
-    return document.getElementById(elementID);
-}
+// function UI(elementID) {
+//     return document.getElementById(elementID);
+// }
 
 function resetVariable() {
     clearTimeout(timeoutCheckMessage);
