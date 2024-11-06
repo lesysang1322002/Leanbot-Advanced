@@ -85,10 +85,11 @@ function onDisconnected(event) {
 }
 
 async function send(data) {
-    if (! gattCharacteristic) {
+    if (!gattCharacteristic) {
         console.log("GATT Characteristic not found.");
         return;
     }
+    data += '\n';
     console.log("You -> " + data);
     let start = 0;
     const dataLength = data.length;
@@ -101,11 +102,6 @@ async function send(data) {
             break;
         }
         start += 16;
-    }
-    try {
-        await gattCharacteristic.writeValue(str2ab('\n'));
-    } catch (error) {
-        console.error("Error writing newline to characteristic:", error);
     }
 }
 
@@ -452,7 +448,7 @@ function DCMotor_updateSliderValue(value) { // Khi điều chỉnh thanh trượ
     if (!gattCharacteristic) return;       // Nếu chưa kết nối BLE thì thoát
     UI("DCMotor_Slider").value = value;
     
-    const adjustedValue = UI("DCMotor_Switch").checked ? "+" + value : "-" + value;
+    const adjustedValue = UI("DCMotor_Switch").checked ? value : -value;
     handleAction("DCMotor " + adjustedValue);
     UI("DCMotor_TextArea_PowerLevel").textContent = adjustedValue;
 }
