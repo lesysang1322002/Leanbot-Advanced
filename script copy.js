@@ -128,6 +128,10 @@
 //     return document.getElementById(elementID);
 // }
 
+function logstatusWebName(text){
+    logstatus(text + " - Advance Modules");
+}
+
 function resetVariable() {
     clearTimeout(timeoutCheckMessage);
     checkFirstValue = true;
