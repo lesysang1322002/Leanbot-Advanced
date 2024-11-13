@@ -495,3 +495,7 @@ input:checked + .slider:before {
   width: 70px !important; /* Đảm bảo chiều rộng của textarea được ưu tiên */
   text-align: right;
 }
+
+#MAX4466_TextArea_MinVariance{
+  text-align: right;
+}
