@@ -4,9 +4,7 @@ function logstatusWebName(text){
 
 function resetVariable() {
     clearTimeout(timeoutCheckMessage);
-    checkFirstValue = true;
-    MPU6050_checkmessage = false;
-    checkmessageAPDS9960 = false;
+    MAX4466_firstValue = true;
 
     document.querySelectorAll("textarea").forEach(el => el.value = ""); // Xóa nội dung của tất cả textarea
     
@@ -39,19 +37,28 @@ function handleSerialLine(line) {
     console.log("Nano > " + line);
     const arrString = line.split(/[ \t]+/);
 
-    if (MPU6050_checkmessage && checkmessageAPDS9960) clearTimeout(timeoutCheckMessage);
+    checkCodefromLeanbot(arrString);
     
     switch (arrString[0]) {
-        case 'MAX4466' : return MAX4466_handleInit(arrString);
-        case 'MPU6050' : return MPU6050_handleInit(arrString);
-        case 'APDS9960': return APDS9960_handleInit(arrString);
-        case 'VL53L0x' : return VL53L0X_handleInit(arrString);
+        case 'MAX4466' : return MAX4466_handle(arrString);
+        case 'MPU6050' : return MPU6050_handle(arrString);
+        case 'APDS9960': return APDS9960_handle(arrString);
+        case 'VL53L0x' : return VL53L0X_handle(arrString);
         default        : return;
     }
 }
 
+let isLeanbotAdvance = false;
+function checkCodefromLeanbot(arrString) {
+    if(isLeanbotAdvance) return;
+
+    if (arrString[0] === 'APDS9960') {
+        clearTimeout(timeoutCheckMessage);
+        isLeanbotAdvance = true;
+    }
+}
+
 //*******APDS9960*******/
-let checkmessageAPDS9960 = false;
 let RGBmax = 0, Cmax = 0;
 
 let counts = {
@@ -61,12 +68,8 @@ let counts = {
     DOWN: 0
 };
 
-function APDS9960_handleInit(arrString) {
-    checkmessageAPDS9960 = true;
+function APDS9960_handle(arrString) {
     UI('APDS9960_TextArea').value = arrString.slice(1, arrString.length).join(" ");
-
-    if(arrString[2] === "error" || arrString[2] === "ok") return;
-
     APDS9960_handleRGBC(arrString);
     APDS9960_handleProximity(arrString);
     APDS9960_handleGesture(arrString);
@@ -75,33 +78,37 @@ function APDS9960_handleInit(arrString) {
 function APDS9960_handleRGBC(arrString) {
     const idx = arrString.indexOf('RGBC');
     if (idx === -1) return;
-    UI('APDS9960_TextArea_R').value = arrString[idx + 1];
-    UI('APDS9960_TextArea_G').value = arrString[idx + 2];
-    UI('APDS9960_TextArea_B').value = arrString[idx + 3];
-    UI('APDS9960_TextArea_C').value = arrString[idx + 4];
-
-    const rValue = parseInt(arrString[idx + 1]);
-    const gValue = parseInt(arrString[idx + 2]);
-    const bValue = parseInt(arrString[idx + 3]);
-    const cValue = parseInt(arrString[idx + 4]);
+   
+    const rValue = updateUI('R', idx + 1);
+    const gValue = updateUI('G', idx + 2);
+    const bValue = updateUI('B', idx + 3);
+    const cValue = updateUI('C', idx + 4);
 
     RGBmax = Math.max(RGBmax, rValue, gValue, bValue);
-    Cmax = Math.max(Cmax, cValue);
+    Cmax   = Math.max(Cmax, cValue);
 
     const cDisplay = mapValue(cValue, 0, Cmax, 0, 255);
     const rDisplay = mapValue(rValue, 0, RGBmax, 0, 255);
     const gDisplay = mapValue(gValue, 0, RGBmax, 0, 255);
     const bDisplay = mapValue(bValue, 0, RGBmax, 0, 255);
 
-    APDS9960_Square_C.style.backgroundColor = `rgb(${cDisplay}, ${cDisplay}, ${cDisplay})`;
+    APDS9960_Square_C.style.backgroundColor   = `rgb(${cDisplay}, ${cDisplay}, ${cDisplay})`;
     APDS9960_Square_RGB.style.backgroundColor = `rgb(${rDisplay}, ${gDisplay}, ${bDisplay})`;
+
+    function updateUI(ui, idx) {
+        const value = parseInt(arrString[idx]);
+        UI('APDS9960_TextArea_' + ui).value = value;
+        return value;
+    }
 }
 
 function APDS9960_handleProximity(arrString) {
     const idx = arrString.indexOf('Prox');
     if (idx === -1) return;
-    UI('APDS9960_progressProx').value = arrString[idx + 1];
-    UI('APDS9960_TextArea_proximity').value = arrString[idx + 1];
+
+    const proximity = arrString[idx + 1];
+    UI('APDS9960_progressProx').value = proximity;
+    UI('APDS9960_TextArea_proximity').value = proximity;
 }
 
 function APDS9960_handleGesture(arrString) {
@@ -181,89 +188,87 @@ gauge.set(0);
 // Thiết lập tốc độ chuyển động
 gauge.animationSpeed = 32;
 
-let checkFirstValue = true;
+let MAX4466_firstValue = true;
 let minMean, maxMean, minVariance, maxVariance;
 let volume;
-let minVolume;
 let smoothVolume = 0;
 
-function MAX4466_handleInit(arrString) {
+function MAX4466_handle(arrString) {
     UI('MAX4466_TextArea').value = arrString.slice(1, arrString.length).join(" ");
 
-    let MeanInt = MAX4466_handleMean(arrString);
-    let VarianceInt = MAX4466_handleVariance(arrString);
+    MAX4466_handleInit(arrString);
+    MAX4466_handleMean(arrString);
+    MAX4466_handleVariance(arrString);         
+}
 
-    if(checkFirstValue){
-        minMean = MeanInt;
-        maxMean = MeanInt;
-        minVariance = VarianceInt;
-        maxVariance = VarianceInt;
-        checkFirstValue = false;
-        minVolume = 10 * Math.log10(VarianceInt);
-    }
-
-    minMean = Math.min(minMean, MeanInt);
-    maxMean = Math.max(maxMean, MeanInt);
-    minVariance = Math.min(minVariance, VarianceInt);
-    maxVariance = Math.max(maxVariance, VarianceInt);
-
-    UI('MAX4466_TextArea_MinMean').value = minMean;
-    UI('MAX4466_TextArea_MaxMean').value = maxMean;
-    UI('MAX4466_TextArea_MinVariance').value = minVariance;
-    UI('MAX4466_TextArea_MaxVariance').value = maxVariance;
-
-    if(VarianceInt === 0) {
-        if(!checkFirstValue) UI('MAX4466_TextArea').value = "Not plugged in";
-        UI('MAX4466_TextArea_Mean').value = "";
-        UI('MAX4466_TextArea_MinMean').value = "";
-        UI('MAX4466_TextArea_MaxMean').value = "";
-        checkFirstValue = true;
+function MAX4466_handleInit(arrString) {
+    if ( ! MAX4466_handleVariance(arrString) ) {
+        UI('MAX4466_TextArea').value = "Not plugged in";
+        MAX4466_firstValue = true;
         // Cập nhật màu cung tròn thành xám
         gauge.options.staticZones = [
             { strokeStyle: "#808080", min: 0, max: gauge.maxValue } // Cả cung tròn có màu xám
         ];
-    }
-    else{
-        gauge.options.staticZones = [
-            { strokeStyle: "#FFA500", min: 0, max: 20 },  // Cam (Orange)
-            { strokeStyle: "#FFFF00", min: 20, max: 30 }, // Vàng (Yellow)
-            { strokeStyle: "#30B32D", min: 30, max: 40 }  // Xanh Lá (Green)
-        ];
+        return;
     }
 
-    if (VarianceInt > 0) volume = 10 * Math.log10(VarianceInt);
-    else volume = 0;
-
-    smoothVolume += (volume - smoothVolume) / 8;
-    minVolume = Math.min(minVolume, smoothVolume);
-  
-    // Hiển thị giá trị đã làm tròn trên giao diện
-    UI("preview-textfield").textContent = smoothVolume.toFixed(1);
-    // Cập nhật gauge với giá trị không làm tròn để mượt mà hơn
-    gauge.set(smoothVolume);            
+    gauge.options.staticZones = [
+        { strokeStyle: "#FFA500", min: 0, max: 20 },  // Cam (Orange)
+        { strokeStyle: "#FFFF00", min: 20, max: 30 }, // Vàng (Yellow)
+        { strokeStyle: "#30B32D", min: 30, max: 40 }  // Xanh Lá (Green)
+    ];
 }
+
 
 function MAX4466_handleMean(arrString) {
     const idx = arrString.indexOf('Mean');
     if (idx === -1) return;
-    UI('MAX4466_TextArea_Mean').value = arrString[idx + 1];
-    return parseInt(arrString[idx + 1]);
+
+    const xMean = parseInt(arrString[idx + 1]);
+    UI('MAX4466_TextArea_Mean').value = xMean;
+
+    if (MAX4466_firstValue) minMean = maxMean = xMean;
+
+    minMean = Math.min(minMean, xMean);
+    maxMean = Math.max(maxMean, xMean);
+    UI('MAX4466_TextArea_MinMean').value = minMean;
+    UI('MAX4466_TextArea_MaxMean').value = maxMean;
+
+    return xMean;
 }
 
 function MAX4466_handleVariance(arrString) {
     const idx = arrString.indexOf('Variance');
     if (idx === -1) return;
-    UI('MAX4466_TextArea_Variance').value = arrString[idx + 1];
-    return parseInt(arrString[idx + 1]);
+    
+    const xVariance = parseInt(arrString[idx + 1]);
+    UI('MAX4466_TextArea_Variance').value = xVariance;
+
+    if (MAX4466_firstValue) {
+        minVariance = maxVariance = xVariance;
+        MAX4466_firstValue = false;
+    }
+
+    minVariance = Math.min(minVariance, xVariance);
+    maxVariance = Math.max(maxVariance, xVariance);
+    UI('MAX4466_TextArea_MinVariance').value = minVariance;
+    UI('MAX4466_TextArea_MaxVariance').value = maxVariance;
+
+    const volume = xVariance > 0 ? 10 * Math.log10(xVariance) : 0;
+    smoothVolume += (volume - smoothVolume) / 8;
+
+    // Hiển thị giá trị đã làm tròn trên giao diện
+    UI("preview-textfield").textContent = smoothVolume.toFixed(1);
+    // Cập nhật gauge với giá trị không làm tròn để mượt mà hơn
+    gauge.set(smoothVolume); 
+
+    return xVariance;  
 }
 
 //*******MPU6050*******/
-let MPU6050_checkmessage = false;
 
-function MPU6050_handleInit(arrString) {
-    MPU6050_checkmessage = true;
+function MPU6050_handle(arrString) {
     UI('MPU6050_TextArea').value = arrString.slice(1, arrString.length).join(" ");
-    if(arrString[2] === "error" || arrString[2] === "ok") return;
 
     MPU6050_handleAxyz(arrString);
     MPU6050_handleGxyz(arrString);
@@ -274,6 +279,7 @@ function MPU6050_handleInit(arrString) {
 function MPU6050_handleAxyz(arrString) {
     const idx = arrString.indexOf('Axyz');
     if (idx === -1) return;
+
     UI('MPU6050_TextArea_Ax').value = arrString[idx + 1];
     UI('MPU6050_TextArea_Ay').value = arrString[idx + 2];
     UI('MPU6050_TextArea_Az').value = arrString[idx + 3];
@@ -282,6 +288,7 @@ function MPU6050_handleAxyz(arrString) {
 function MPU6050_handleGxyz(arrString) {
     const idx = arrString.indexOf('Gxyz');
     if (idx === -1) return;
+
     UI('MPU6050_TextArea_Gx').value = arrString[idx + 1];
     UI('MPU6050_TextArea_Gy').value = arrString[idx + 2];
     UI('MPU6050_TextArea_Gz').value = arrString[idx + 3];
@@ -316,21 +323,13 @@ function MPU6050_handleTempIC(arrString) {
 
 //*******VL53L0X*******/
 
-function VL53L0X_handleInit(arrString) {
+function VL53L0X_handle(arrString) {
     UI('VL53L0x_TextArea').value = arrString.slice(1, arrString.length).join(" ");
-    if(arrString[2] === "error" || arrString[2] === "ok") return;
 
-    if(arrString[1] === 'not') { //
-        UI('VL53L0x_TextArea').value = arrString.join(" ");
-        // Xóa nội dung trước đó (trường hợp cắm module rồi tháo ra)
-        UI('VL53L0x_ProgressDistance').value = 0;
-        UI('VL53L0x_TextArea_Distance').value = "";
-        return;
-    }
-
-    if ( parseInt(arrString[1]) <= 2000) { // Nếu khoảng cách nhỏ hơn 2m
-        UI('VL53L0x_ProgressDistance').value = arrString[1]; // Thanh progress đang để max = 2000
-        UI('VL53L0x_TextArea_Distance').value = arrString[1] + " mm"; // Hiển thị khoảng cách
+    const Distance = parseInt(arrString[1]);
+    if ( Distance <= 2000) { // Nếu khoảng cách nhỏ hơn 2m
+        UI('VL53L0x_ProgressDistance').value  = Distance; // Hiển thị thanh tiến trình
+        UI('VL53L0x_TextArea_Distance').value = Distance + " mm"; // Hiển thị khoảng cách
         return;
     }
     // Nếu khoảng cách lớn hơn 2m
@@ -338,8 +337,6 @@ function VL53L0X_handleInit(arrString) {
     UI('VL53L0x_ProgressDistance').value = 0;
     UI('VL53L0x_TextArea_Distance').value = "";
 }
-
-
 //*******DCMotor*******/
 
 function DCMotor_updateSliderValue(value) { // Khi điều chỉnh thanh trượt
