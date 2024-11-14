@@ -409,7 +409,7 @@ function handleChangedValue(event) {
                     setTimeout(() => {
                         btnUp.style.transition = 'background-color 5s ease'; // Thêm hiệu ứng mờ dần
                         btnUp.style.backgroundColor = 'transparent'; // Chuyển dần sang trong suốt
-                    }, 2000);
+                    }, 1000);
                 
                     console.log("UP");
                 }

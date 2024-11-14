@@ -197,8 +197,8 @@ function MAX4466_handle(arrString) {
     UI('MAX4466_TextArea').value = arrString.slice(1, arrString.length).join(" ");
 
     MAX4466_handleInit(arrString);
-    MAX4466_handleMean(arrString);
-    MAX4466_handleVariance(arrString);         
+    MAX4466_handleVariance(arrString);
+    MAX4466_handleMean(arrString);         
 }
 
 function MAX4466_handleInit(arrString) {
@@ -219,7 +219,6 @@ function MAX4466_handleInit(arrString) {
     ];
 }
 
-
 function MAX4466_handleMean(arrString) {
     const idx = arrString.indexOf('Mean');
     if (idx === -1) return;
@@ -227,7 +226,10 @@ function MAX4466_handleMean(arrString) {
     const xMean = parseInt(arrString[idx + 1]);
     UI('MAX4466_TextArea_Mean').value = xMean;
 
-    if (MAX4466_firstValue) minMean = maxMean = xMean;
+    if (MAX4466_firstValue) {
+        minMean = maxMean = xMean;
+        MAX4466_firstValue = false;
+    }
 
     minMean = Math.min(minMean, xMean);
     maxMean = Math.max(maxMean, xMean);
@@ -244,10 +246,7 @@ function MAX4466_handleVariance(arrString) {
     const xVariance = parseInt(arrString[idx + 1]);
     UI('MAX4466_TextArea_Variance').value = xVariance;
 
-    if (MAX4466_firstValue) {
-        minVariance = maxVariance = xVariance;
-        MAX4466_firstValue = false;
-    }
+    if (MAX4466_firstValue) minVariance = maxVariance = xVariance;
 
     minVariance = Math.min(minVariance, xVariance);
     maxVariance = Math.max(maxVariance, xVariance);
